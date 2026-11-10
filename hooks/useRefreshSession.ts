@@ -5,7 +5,7 @@ import type { Session } from 'next-auth';
 import { getSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-export function RefreshSession() {
+export function useRefreshSession() {
   const router = useRouter();
   const work = useRef<Promise<Session | null> | null>(null);
   const [message, setMessage] = useState('');
@@ -32,14 +32,5 @@ export function RefreshSession() {
     };
   }, [router]);
 
-  return (
-    <div role="status">
-      <p>{message || '로그인 상태를 갱신하고 있습니다…'}</p>
-      {message && (
-        <button type="button" onClick={() => window.location.reload()}>
-          다시 시도
-        </button>
-      )}
-    </div>
-  );
+  return { message };
 }
