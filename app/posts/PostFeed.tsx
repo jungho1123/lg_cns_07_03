@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
@@ -35,32 +36,32 @@ export default function PostFeed({ result, mine = false }: Props) {
   const posts = [...unique.values()];
 
   return (
-    <section aria-label="게시글 목록" aria-busy={pending} className="space-y-5">
-      {!result.ok && <div role="status" className="space-y-3 rounded-2xl border bg-white p-6">
+    <section aria-label="게시글 목록" aria-busy={pending} className="posts-feed">
+      {!result.ok && <div role="status" className="posts-notice">
         <p>{result.message}</p>
-        {result.status === 401 ? <Link className="text-blue-700 underline" href="/login">로그인하기</Link> :
-          <button type="button" disabled={pending} onClick={() => startTransition(() => router.refresh())} className="text-blue-700 underline">다시 시도</button>}
+        {result.status === 401 ? <Link className="posts-action" href="/login">로그인하기</Link> :
+          <button type="button" disabled={pending} onClick={() => startTransition(() => router.refresh())} className="posts-action">다시 시도</button>}
       </div>}
-      {latest && posts.length === 0 && <p className="rounded-2xl border bg-white p-6">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
-      {posts.length > 0 && <ul className="space-y-4">{posts.map(post => (
+      {latest && posts.length === 0 && <p className="posts-empty">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
+      {posts.length > 0 && <ul className="posts-list">{posts.map(post => (
         <li key={post.id}>
-          <article className="space-y-3 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <header className="flex items-center gap-3">
-              <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
-              <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-gray-500" dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></div>
+          <article className="posts-card">
+            <header className="posts-author">
+              <span aria-hidden="true" className="posts-avatar">{post.author.name.trim().slice(0, 1) || '?'}</span>
+              <div><p className="posts-authorName">{post.author.name}</p><time className="posts-date" dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></div>
             </header>
-            <h2 className="break-words text-xl font-bold"><Link className="hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
-            <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm leading-7 text-gray-600">{post.content}</p>
+            <h2 className="posts-postTitle"><Link className="posts-postLink" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
+            <p className="posts-body">{post.content}</p>
           </article>
         </li>
       ))}</ul>}
       {result.ok && latest && (latest.hasNext ? (
         <button type="button" disabled={pending}
           onClick={() => startTransition(() => router.replace(`/posts?page=${latest.page + 1}${mine ? '&view=mine' : ''}`, { scroll: false }))}
-          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 font-semibold disabled:opacity-50">
+          className="posts-more">
           {pending ? '불러오는 중...' : '더보기'}
         </button>
-      ) : posts.length > 0 ? <p role="status" className="text-center text-sm text-gray-500">모든 게시글을 확인했습니다.</p> : null)}
+      ) : posts.length > 0 ? <p role="status" className="posts-end">모든 게시글을 확인했습니다.</p> : null)}
     </section>
   );
 }

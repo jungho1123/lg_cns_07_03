@@ -31,7 +31,7 @@ async function PostDetail({ params }: { params: Params }) {
 }
 export default function PostDetailPage({ params }: { params: Params }) {
   return (
-    <main className="min-h-dvh bg-gray-100 px-4 py-10 text-gray-900">
+    <main className="min-h-dvh px-4 py-10 text-gray-900" style={{ backgroundColor: '#ffffff' }}>
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <header className="flex items-end justify-between gap-4">
           <div className="space-y-2"><h1 className="text-3xl font-bold">게시글 상세</h1><p className="text-sm text-gray-600">글 내용을 확인해 보세요.</p></div>
