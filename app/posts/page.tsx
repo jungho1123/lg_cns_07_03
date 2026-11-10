@@ -1,8 +1,3 @@
-export default function PostsPage() {
-  return (
-    <>
-      {' '}
-      <h1>LOGIN SUCCESS</h1>{' '}
-    </>
-  );
+export default function Page() {
+  return <main>준비 중입니다.</main>;
 }
