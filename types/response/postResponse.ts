@@ -26,11 +26,5 @@ export type PostReadResult<T> =
   | { ok: true; data: T }
   | { ok: false; status: number; message: string };
 
-// 내 글 API는 빈 items 응답만 실제 확인했습니다. 항목 타입은 확정하지 않습니다.
-export type MyPostPageResponse = {
-  items: unknown[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-};
+// /api/v1/posts/me의 응답은 전체 게시글 목록과 동일합니다.
+export type MyPostPageResponse = PostPageResponse;

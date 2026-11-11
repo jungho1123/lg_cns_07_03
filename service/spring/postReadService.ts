@@ -5,7 +5,7 @@ import { ApiError, AuthExpiredError, AuthRefreshRequiredError } from '@/lib/apiE
 import { requireAuthToken } from '@/lib/currentUser';
 import { isAccessTokenExpired } from '@/lib/auth/token';
 import { readApiData, springFetch } from '@/lib/fetchClients';
-import type { MyPostPageResponse, PostListQuery, PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
+import type { PostListQuery, PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
 const id = z.number().int().safe().nonnegative();
 const isoDate = z.string().refine(value => Number.isFinite(Date.parse(value)));
@@ -77,29 +77,10 @@ export async function getPost(postId: string): Promise<PostReadResult<PostRespon
   return read(matchApiUrl.postRead.detail(postId), parsePostData);
 }
 
-const myPostPageSchema: z.ZodType<MyPostPageResponse> = z.object({
-  items: z.array(z.unknown()),
-  page: z.number().int().nonnegative(),
-  size: z.number().int().positive(),
-  totalElements: z.number().int().safe().nonnegative(),
-  totalPages: z.number().int().nonnegative(),
-});
-
+// /api/v1/posts/me는 전체 목록과 동일한 items/page/size/hasNext 응답을 반환합니다.
 export function parseMyPostPageData(value: unknown): PostPageResponse {
-  const parsed = myPostPageSchema.safeParse(value);
-  if (!parsed.success) throw new ApiError(502, '내 글 목록 응답 형식이 올바르지 않습니다.');
-  // 아직 비어 있지 않은 응답은 미확인입니다. 피드 형식과 일치하는 경우에만 표시합니다.
-  // 다른 형식이면 실패시키며, 실제 항목 확인 후 전용 타입/변환 함수를 추가해야 합니다.
-  const posts = z.array(postSchema).safeParse(parsed.data.items);
-  if (!posts.success) throw new ApiError(502, '내 글 항목의 실제 응답 형식을 확인해야 합니다.');
-  return {
-    items: posts.data,
-    page: parsed.data.page,
-    size: parsed.data.size,
-    hasNext: parsed.data.page + 1 < parsed.data.totalPages,
-  };
+  return parsePostPageData(value);
 }
-
 export async function listMyPosts(query: PostListQuery = {}): Promise<PostReadResult<PostPageResponse>> {
   const { page = 0, size = 20 } = query;
   if (!Number.isSafeInteger(page) || page < 0 || page > 2147483647 ||

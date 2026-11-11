@@ -8,7 +8,7 @@ export const matchApiUrl = {
   },
   postRead: {
     list: '/api/v1/posts',
-    mine: '/api/v1/me/posts',
+    mine: '/api/v1/posts/me',
     detail: (postId: string) => `/api/v1/posts/${encodeURIComponent(postId)}`,
   },
   // [4번 박세진] 목록(GET)과 작성(POST)은 같은 주소, 삭제(DELETE)는 detail
