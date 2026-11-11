@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
+import { HideOnPaths } from "@/components/layout/HideOnPaths";
 import { TempFooter } from "@/components/layout/TempFooter";
 import { TempHeader } from "@/components/layout/TempHeader";
-import { HideOnPaths } from "@/components/organisms/HideOnPaths";
 import "./globals.css";
 
 // 헤더/푸터를 보이지 않을 경로 (로그인 화면 등)
