@@ -5,6 +5,8 @@ import { formatDateTime } from '@/lib/date';
 import { getPost } from '@/service/spring/postReadService';
 import CommentList from './CommentList';
 import PostActions from './PostActions';
+import PostDetailFallback from "@/components/loader/PostDetailFallback";
+
 
 type Params = Promise<{ postId: string }>;
 async function PostDetail({ params }: { params: Params }) {
@@ -68,7 +70,7 @@ export default function PostDetailPage({ params }: { params: Params }) {
         {/* 화면에는 보이지 않지만 스크린리더가 화면 제목을 읽을 수 있게 둔다 */}
         <h1 className="sr-only">게시글 상세</h1>
         <Link href="/posts" className="w-fit text-sm font-semibold text-blue-700 hover:underline">← 목록으로</Link>
-        <Suspense fallback={<p role="status">글을 불러오는 중...</p>}><PostDetail params={params} /></Suspense>
+        <Suspense fallback={<PostDetailFallback />}><PostDetail params={params} /></Suspense>
       </div>
     </main>
   );
