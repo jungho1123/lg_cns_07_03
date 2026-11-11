@@ -9,7 +9,7 @@ export default function CommentForm() {
         id="comment-content"
         name="content"
         rows={3}
-        maxLength={500}
+        maxLength={2000}
         required
         placeholder="댓글을 입력하세요"
         className="w-full rounded border p-2"

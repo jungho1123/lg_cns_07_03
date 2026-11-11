@@ -1,8 +1,10 @@
 import 'server-only';
 import { z } from 'zod';
 import { matchApiUrl } from '@/config/apiuri';
-import { ApiError } from '@/lib/apiError';
+import { ApiError, AuthRefreshRequiredError } from '@/lib/apiError';
 import { authenticatedRequest } from '@/lib/auth/authenticatedRequest';
+import { isAccessTokenExpired } from '@/lib/auth/token';
+import { requireAuthToken } from '@/lib/currentUser';
 import { readApiData, springFetch } from '@/lib/fetchClients';
 import type { CommentItem } from '@/types/response/commentResponse';
 
@@ -26,9 +28,13 @@ function parseWith<T>(schema: z.ZodType<T>) {
   };
 }
 
-// 확인 필요: 로그인 없이 목록 조회가 되는지. 401이 오면 서버 컴포넌트용 인증 호출 방법을 1번과 정한다.
+// 화면(서버 컴포넌트)에서 부르므로 authenticatedRequest 대신 토큰을 직접 붙인다 (postReadService와 같은 방식)
 export async function getComments(postId: number): Promise<CommentItem[]> {
-  const response = await springFetch(matchApiUrl.comment.list(postId));
+  const token = await requireAuthToken();
+  if (isAccessTokenExpired(token, Date.now())) throw new AuthRefreshRequiredError();
+  const response = await springFetch(matchApiUrl.comment.list(postId), {
+    headers: { Authorization: `Bearer ${token.accessToken}` },
+  });
   return readApiData(response, parseWith(z.array(commentSchema)));
 }
 

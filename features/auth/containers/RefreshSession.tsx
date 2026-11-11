@@ -1,6 +1,6 @@
 'use client';
 
-import { RefreshSessionStatus } from '@/components/molecules/RefreshSessionStatus';
+import { RefreshSessionStatus } from '@/features/auth/ui/RefreshSessionStatus';
 import { useRefreshSession } from '@/hooks/useRefreshSession';
 
 export function RefreshSession() {
