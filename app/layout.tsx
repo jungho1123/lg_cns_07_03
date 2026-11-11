@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
+import { TempFooter } from "@/components/layout/TempFooter";
+import { TempHeader } from "@/components/layout/TempHeader";
+import { HideOnPaths } from "@/components/organisms/HideOnPaths";
 import "./globals.css";
+
+// 헤더/푸터를 보이지 않을 경로 (로그인 화면 등)
+const BARE_PATHS = ["/login"];
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +30,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* usePathname은 동적 경로(/posts/[postId])에서 Suspense가 필요하다(cacheComponents).
+            주소를 읽는 부분만 Suspense로 감싸고, 페이지(children)는 감싸지 않는다. */}
+        <Suspense fallback={null}>
+          <HideOnPaths paths={BARE_PATHS}>
+            <TempHeader />
+          </HideOnPaths>
+        </Suspense>
+        <div className="flex flex-1 flex-col">{children}</div>
+        <Suspense fallback={null}>
+          <HideOnPaths paths={BARE_PATHS}>
+            <TempFooter />
+          </HideOnPaths>
+        </Suspense>
+      </body>
     </html>
   );
 }
