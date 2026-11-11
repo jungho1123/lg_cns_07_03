@@ -2,8 +2,8 @@
 
 import { refresh } from 'next/cache';
 import { z } from 'zod';
-import { AuthExpiredError, publicErrorMessage } from '@/lib/apiError';
-import { createComment } from '@/service/spring/commentService';
+import { ApiError, AuthExpiredError, publicErrorMessage } from '@/lib/apiError';
+import { createComment, deleteComment } from '@/service/spring/commentService';
 
 export type CommentFormState = { message: string; content: string };
 
@@ -36,4 +36,27 @@ export async function createCommentAction(
   }
   refresh();
   return { message: '', content: '' };
+}
+
+export type CommentDeleteState = { message: string };
+
+// 삭제 버튼은 내 댓글에만 보이지만, 최종 판단은 서버가 토큰으로 한다(남의 댓글이면 403).
+export async function deleteCommentAction(
+  postId: number,
+  commentId: number,
+): Promise<CommentDeleteState> {
+  if (![postId, commentId].every((id) => Number.isSafeInteger(id) && id > 0)) {
+    return { message: '댓글 번호가 올바르지 않습니다.' };
+  }
+  try {
+    await deleteComment(postId, commentId);
+  } catch (error) {
+    if (error instanceof AuthExpiredError) return { message: error.message };
+    if (error instanceof ApiError && error.status === 403) {
+      return { message: '내가 쓴 댓글만 삭제할 수 있습니다.' };
+    }
+    return { message: publicErrorMessage(error) };
+  }
+  refresh();
+  return { message: '' };
 }
