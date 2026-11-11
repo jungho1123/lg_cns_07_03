@@ -36,32 +36,32 @@ export default function PostFeed({ result, mine = false }: Props) {
   const posts = [...unique.values()];
 
   return (
-    <section aria-label="게시글 목록" aria-busy={pending} className="posts-feed">
-      {!result.ok && <div role="status" className="posts-notice">
+    <section aria-label="게시글 목록" aria-busy={pending} className="flex min-w-0 flex-col gap-5">
+      {!result.ok && <div role="status" className="flex flex-col items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-6 [overflow-wrap:anywhere]">
         <p>{result.message}</p>
-        {result.status === 401 ? <Link className="posts-action" href="/login">로그인하기</Link> :
-          <button type="button" disabled={pending} onClick={() => startTransition(() => router.refresh())} className="posts-action">다시 시도</button>}
+        {result.status === 401 ? <Link className="cursor-pointer border-0 bg-transparent p-0 text-[#1d4ed8] underline [font:inherit] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4" href="/login">로그인하기</Link> :
+          <button type="button" disabled={pending} onClick={() => startTransition(() => router.refresh())} className="cursor-pointer border-0 bg-transparent p-0 text-[#1d4ed8] underline [font:inherit] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4">다시 시도</button>}
       </div>}
-      {latest && posts.length === 0 && <p className="posts-empty">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
-      {posts.length > 0 && <ul className="posts-list">{posts.map(post => (
+      {latest && posts.length === 0 && <p className="rounded-2xl border border-[#e5e7eb] bg-white p-6 [overflow-wrap:anywhere]">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
+      {posts.length > 0 && <ul className="m-0 flex list-none flex-col gap-4 p-0">{posts.map(post => (
         <li key={post.id}>
-          <article className="posts-card">
-            <header className="posts-author">
-              <span aria-hidden="true" className="posts-avatar">{post.author.name.trim().slice(0, 1) || '?'}</span>
-              <div><p className="posts-authorName">{post.author.name}</p><time className="posts-date" dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></div>
+          <article className="flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] max-[480px]:rounded-[20px] max-[480px]:p-5">
+            <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
+              <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
+              <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-[#6b7280]" dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></div>
             </header>
-            <h2 className="posts-postTitle"><Link className="posts-postLink" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
-            <p className="posts-body">{post.content}</p>
+            <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline hover:underline focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
+            <p className="line-clamp-3 text-sm leading-7 whitespace-pre-wrap text-[#4b5563] [overflow-wrap:anywhere]">{post.content}</p>
           </article>
         </li>
       ))}</ul>}
       {result.ok && latest && (latest.hasNext ? (
         <button type="button" disabled={pending}
           onClick={() => startTransition(() => router.replace(`/posts?page=${latest.page + 1}${mine ? '&view=mine' : ''}`, { scroll: false }))}
-          className="posts-more">
+          className="w-full cursor-pointer rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-[#111827] [font:inherit] font-semibold hover:bg-[#f9fafb] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4">
           {pending ? '불러오는 중...' : '더보기'}
         </button>
-      ) : posts.length > 0 ? <p role="status" className="posts-end">모든 게시글을 확인했습니다.</p> : null)}
+      ) : posts.length > 0 ? <p role="status" className="text-center text-sm text-[#6b7280]">모든 게시글을 확인했습니다.</p> : null)}
     </section>
   );
 }
