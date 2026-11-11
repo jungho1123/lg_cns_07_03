@@ -60,13 +60,19 @@ export default function PostFeed({ result, mine = false }: Props) {
       {latest && posts.length === 0 && <p className="rounded-2xl border border-[#e5e7eb] bg-white p-6 [overflow-wrap:anywhere]">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
       {posts.length > 0 && <ul className="m-0 flex list-none flex-col gap-4 p-0">{posts.map(post => (
         <li key={post.id}>
-          <article className="flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] max-[480px]:rounded-[20px] max-[480px]:p-5">
+          {/* 카드 전체가 클릭되도록 relative로 두고, 아래 상세 링크가 after로 카드 전체를 덮는다(링크는 하나라서 중첩되지 않는다) */}
+          <article className="relative flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] transition-colors hover:bg-[#f9fafb] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[#2563eb] max-[480px]:rounded-[20px] max-[480px]:p-5">
             <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
               <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
               <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-[#6b7280]" dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></div>
             </header>
-            <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline hover:underline focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
-            <p className="line-clamp-3 text-sm leading-7 whitespace-pre-wrap text-[#4b5563] [overflow-wrap:anywhere]">{post.content}</p>
+            {post.title?.trim() ? <>
+              <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim()}</Link></h2>
+              <p className="line-clamp-3 text-sm leading-7 whitespace-pre-wrap text-[#4b5563] [overflow-wrap:anywhere]">{post.content}</p>
+            </> : (
+              // 제목이 없는 글(텍스트박스로 쓴 글): 내용이 곧 본문이라 제목 줄 없이 내용 자체를 상세 링크로 보여 준다
+              <p className="line-clamp-3 text-base leading-7 whitespace-pre-wrap text-[#111827] [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.content}</Link></p>
+            )}
           </article>
         </li>
       ))}</ul>}

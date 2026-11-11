@@ -22,10 +22,11 @@ async function PostDetail({ params }: { params: Params }) {
     </div>
   );
   const post = result.data;
+  const title = post.title?.trim(); // 제목이 없는 글(텍스트박스로 쓴 글)은 제목 줄을 그리지 않는다
   return (
     <article className="space-y-5 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <header className="space-y-4">
-        <h2 className="break-words text-2xl font-bold">{post.title?.trim() || '게시글 보기'}</h2>
+        {title && <h2 className="break-words text-2xl font-bold">{title}</h2>}
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
           <div><p className="font-semibold">{post.author.name}</p>
@@ -34,7 +35,7 @@ async function PostDetail({ params }: { params: Params }) {
           </div>
         </div>
       </header>
-      <div className="whitespace-pre-wrap break-words border-t border-gray-100 pt-5 leading-7">{post.content}</div>
+      <div className={`whitespace-pre-wrap break-words border-t border-gray-100 pt-5 ${title ? 'leading-7' : 'text-lg leading-8'}`}>{post.content}</div>
       <div className="[&>section>ul]:space-y-2 [&>section>ul>li]:rounded-xl [&>section>ul>li]:bg-slate-50 [&>section>ul>li]:p-4 [&>section>p:not([role])]:rounded-xl [&>section>p:not([role])]:bg-slate-50 [&>section>p:not([role])]:p-4">
         <Suspense fallback={<p role="status">댓글을 불러오는 중...</p>}>
           <CommentList postId={post.id} />
