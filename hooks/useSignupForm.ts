@@ -32,17 +32,12 @@ export function useSignupForm() {
       email: data.get('email'),
       name: data.get('name'),
       password: data.get('password'),
+      confirmPassword: data.get('confirm-password'),
       role: data.get('role'),
     });
 
     if (!parsed.ok) {
       setClientMessage(parsed.message);
-      event.preventDefault();
-      return;
-    }
-
-    if (parsed.value.password !== data.get('confirm-password')) {
-      setClientMessage('비밀번호가 일치하지 않습니다.');
       event.preventDefault();
       return;
     }

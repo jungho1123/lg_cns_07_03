@@ -33,25 +33,21 @@ export async function loginAction(
   redirect('/posts');
 }
 
-export async function logoutAction(_previous: {
-  message: string;
-}): Promise<{ message: string }> {
+export async function logoutAction(): Promise<{ message: string }> {
+  let serverLogoutFailed = false;
   try {
     const session = await unstable_update({});
     if (session?.authError) {
-      return {
-        message:
-          '인증이 만료되어 서버 로그아웃을 수행 할 수 없습니다. 다시 로그인후 로그아웃을 시도해 주세요.',
-      };
-    }
-    if (session) {
+      serverLogoutFailed = true;
+    } else if (session) {
       const { accessToken } = await requireAuthToken();
       await springLogout(accessToken);
     }
   } catch {
-    return {
-      message: '서버 로그아웃 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.',
-    };
+    serverLogoutFailed = true;
   }
-  return signOut({ redirectTo: '/login' });
+  // 서버 세션 종료에 실패해도 현재 기기의 인증 쿠키는 반드시 정리한다.
+  return signOut({
+    redirectTo: serverLogoutFailed ? '/login?logout=server-error' : '/login',
+  });
 }

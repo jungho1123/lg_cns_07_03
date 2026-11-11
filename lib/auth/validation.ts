@@ -42,7 +42,8 @@ export const signupSchema = z.object({
     .string({ error: ' 공백일 수 없습니다.' })
     .refine((value) => value.trim().length > 0, {
       error: ' 공백일 수 없습니다.',
-    }),
+    })
+    .min(8, { error: '비밀번호는 8자 이상이어야 합니다.' }),
   role: RoleSchema,
 });
 
@@ -67,6 +68,7 @@ export function validateSignup(input: {
   email: unknown;
   name: unknown;
   password: unknown;
+  confirmPassword: unknown;
   role: unknown;
 }): { ok: true; value: SignupInput } | { ok: false; message: string } {
   const parsed = signupSchema.safeParse(input);
@@ -75,6 +77,9 @@ export function validateSignup(input: {
       ok: false,
       message: parsed.error.issues[0].message ?? ' 입력값을 확인해 주세요 ',
     };
+  }
+  if (parsed.data.password !== input.confirmPassword) {
+    return { ok: false, message: '비밀번호가 일치하지 않습니다.' };
   }
   return {
     ok: true,

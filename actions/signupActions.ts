@@ -2,6 +2,7 @@
 'use server';
 
 import { validateSignup } from '@/lib/auth/validation';
+import { ApiError, publicErrorMessage } from '@/lib/apiError';
 import { signup } from '@/service/spring/authService';
 import { redirect } from 'next/navigation';
 export async function signupAction(
@@ -12,13 +13,19 @@ export async function signupAction(
     email: formData.get('email'),
     name: formData.get('name'),
     password: formData.get('password'),
+    confirmPassword: formData.get('confirm-password'),
     role: formData.get('role'),
   });
   if (!parsed.ok) return { message: parsed.message };
   try {
     await signup(parsed.value);
-  } catch {
-    return { message: '회원가입 처리에 실패했습니다.' };
+  } catch (error) {
+    return {
+      message:
+        error instanceof ApiError && error.status === 409
+          ? error.message
+          : publicErrorMessage(error),
+    };
   }
   redirect('/login');
 }
