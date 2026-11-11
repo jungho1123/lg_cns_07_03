@@ -17,4 +17,10 @@ export const matchApiUrl = {
     detail: (postId: number, commentId: number) =>
       `/api/v1/posts/${postId}/comments/${commentId}`,
   },
+  // 알림: 목록은 ?limit=50 처럼 개수를 붙여서 부른다
+  notification: {
+    list: '/api/v1/notifications',
+    read: (notificationId: number) => `/api/v1/notifications/${notificationId}/read`,
+    readAll: '/api/v1/notifications/read-all',
+  },
 };
