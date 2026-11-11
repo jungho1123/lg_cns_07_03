@@ -2,9 +2,11 @@
 
 import { AuthError } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { signIn, signOut } from '@/auth';
+import { signIn, signOut, unstable_update } from '@/auth';
 import { LoginRejected } from '@/lib/auth/loginError';
 import { validateLogin } from '@/lib/auth/validation';
+import { requireAuthToken } from '@/lib/currentUser';
+import { logout as springLogout } from '@/service/spring/authService';
 
 export async function loginAction(
   _previous: { message: string },
@@ -31,6 +33,21 @@ export async function loginAction(
   redirect('/posts');
 }
 
-export async function logoutAction(): Promise<void> {
-  await signOut({ redirectTo: '/login' });
+export async function logoutAction(): Promise<{ message: string }> {
+  let serverLogoutFailed = false;
+  try {
+    const session = await unstable_update({});
+    if (session?.authError) {
+      serverLogoutFailed = true;
+    } else if (session) {
+      const { accessToken } = await requireAuthToken();
+      await springLogout(accessToken);
+    }
+  } catch {
+    serverLogoutFailed = true;
+  }
+  // 서버 세션 종료에 실패해도 현재 기기의 인증 쿠키는 반드시 정리한다.
+  return signOut({
+    redirectTo: serverLogoutFailed ? '/login?logout=server-error' : '/login',
+  });
 }

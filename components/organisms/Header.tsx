@@ -4,16 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import type { Session } from "next-auth";
+import { LogoutButton } from "@/components/atoms/LogoutButton";
 
 interface HeaderProps {
   onMenuClick: () => void;
-  onLogout: () => Promise<void>;
   user: Session["user"] | null;
 }
 
 export default function Header({
   onMenuClick,
-  onLogout,
   user,
 }: HeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -147,16 +146,10 @@ export default function Header({
                     계정 설정
                   </Link>
 
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsProfileOpen(false);
-                      await onLogout();
-                    }}
-                    className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                  >
-                    로그아웃
-                  </button>
+                  <LogoutButton
+                    variant="ghost"
+                    className="h-auto w-full justify-start px-3 py-2 font-normal text-red-600 hover:bg-red-50 hover:text-red-600"
+                  />
                 </>
               ) : (
                 <>
