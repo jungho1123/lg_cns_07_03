@@ -11,14 +11,12 @@ import ScrollToTopButton from "@/components/atoms/ScrollToTopButton";
 interface MainLayoutClientProps {
   children: React.ReactNode;
   user: Session["user"] | null;
-  onLogout: () => Promise<void>;
   barePaths: string[];
 }
 
 export default function MainLayoutClient({
   children,
   user,
-  onLogout,
   barePaths,
 }: MainLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,7 +41,6 @@ export default function MainLayoutClient({
       <Header
         user={user}
         onMenuClick={() => setIsSidebarOpen(true)}
-        onLogout={onLogout}
       />
 
       {isSidebarOpen && (
@@ -67,7 +64,6 @@ export default function MainLayoutClient({
 
         <Footer
           isLoggedIn={!!user?.id}
-          onLogout={onLogout}
         />
       </div>
        <ScrollToTopButton />

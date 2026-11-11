@@ -2,15 +2,14 @@
 "use client";
 
 import Link from "next/link";
+import { LogoutButton } from "@/components/atoms/LogoutButton";
 
 interface FooterProps {
   isLoggedIn: boolean;
-  onLogout: () => Promise<void>;
 }
 
 export default function Footer({
   isLoggedIn,
-  onLogout,
 }: FooterProps) {
   return (
     <footer className="w-full border-t border-gray-200 bg-white px-6 py-8">
@@ -35,13 +34,10 @@ export default function Footer({
             </Link>
 
             {isLoggedIn ? (
-              <button
-                type="button"
-                onClick={() => void onLogout()}
-                className="rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
-              >
-                로그아웃
-              </button>
+              <LogoutButton
+                variant="ghost"
+                className="h-auto bg-gray-800 px-4 py-2 text-white hover:bg-gray-700 hover:text-white"
+              />
             ) : (
               <Link
                 href="/login"
