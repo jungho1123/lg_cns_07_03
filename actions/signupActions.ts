@@ -17,8 +17,8 @@ export async function signupAction(
   if (!parsed.ok) return { message: parsed.message };
   try {
     await signup(parsed.value);
-    return { message: '회원가입이 완료되었습니다.' };
-  } catch (error) {
+  } catch {
     return { message: '회원가입 처리에 실패했습니다.' };
   }
+  redirect('/login');
 }
