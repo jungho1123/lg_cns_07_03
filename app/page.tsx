@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { FeatureSection } from './_home/FeatureSection';
 import { HeroSection } from './_home/HeroSection';
-import { HomeFooter } from './_home/HomeFooter';
 
 // layout.tsx를 수정하지 않고 이 페이지의 탭 제목과 설명만 지정한다.
 export const metadata: Metadata = {
@@ -14,7 +13,6 @@ export default function Home() {
     <main className="flex flex-1 flex-col bg-white dark:bg-black">
       <HeroSection />
       <FeatureSection />
-      <HomeFooter />
     </main>
   );
 }
