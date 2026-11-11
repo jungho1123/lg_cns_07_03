@@ -1,6 +1,8 @@
 import { AuthExpiredError, AuthRefreshRequiredError, publicErrorMessage } from "@/lib/apiError";
+import { requireCurrentUser } from "@/lib/currentUser";
 import { getComments } from "@/service/spring/commentService";
 import type { CommentItem } from "@/types/response/commentResponse";
+import CommentDeleteButton from "./CommentDeleteButton";
 import CommentForm from "./CommentForm";
 
 // 서버가 UTC로 돌아도(Vercel) 한국 시간으로 보이게 timeZone을 고정
@@ -19,9 +21,11 @@ type CommentListProps = {
 
 export default async function CommentList({ postId }: CommentListProps) {
   let comments: CommentItem[] = [];
+  let myUserId: number | null = null;
   let errorMessage: string | null = null;
   try {
     comments = await getComments(postId);
+    myUserId = (await requireCurrentUser()).userId;
   } catch (error) {
     const needLogin = error instanceof AuthExpiredError || error instanceof AuthRefreshRequiredError;
     errorMessage = needLogin ? "로그인 후 댓글을 볼 수 있습니다." : publicErrorMessage(error);
@@ -51,6 +55,9 @@ export default async function CommentList({ postId }: CommentListProps) {
                 <time dateTime={comment.createdAt} className="text-gray-500">
                   {formatDate(comment.createdAt)}
                 </time>
+                {comment.author.id === myUserId && (
+                  <CommentDeleteButton postId={postId} commentId={comment.id} />
+                )}
               </div>
               <p className="mt-1 whitespace-pre-wrap break-words">{comment.content}</p>
             </li>
