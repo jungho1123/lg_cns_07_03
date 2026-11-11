@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { listPosts, listMyPosts } from '@/service/spring/postReadService';
 import PostComposer from './PostComposer';
 import PostFeed from './PostFeed';
+import PostListFallback from "@/components/loader/PostListFallback";
 
 type Value = string | string[] | undefined;
 type Query = { page?: Value; view?: Value };
@@ -31,7 +32,7 @@ export default function PostsPage({ searchParams }: { searchParams: Promise<Quer
   return (
     <main className="box-border min-h-dvh w-full bg-white px-4 py-10 text-base leading-normal text-[#111827] [font-family:Arial,Helvetica,sans-serif] [&_*]:box-border [&_*::before]:box-border [&_*::after]:box-border [&_h1]:m-0 [&_h2]:m-0 [&_p]:m-0 max-[480px]:px-3 max-[480px]:py-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <Suspense fallback={<p role="status">글 목록을 불러오는 중...</p>}>
+        <Suspense fallback={<PostListFallback />}>
           <PostsContent searchParams={searchParams} />
         </Suspense>
       </div>
