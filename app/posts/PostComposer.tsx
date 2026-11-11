@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useTransition, type KeyboardEvent } from 'react';
+import { useRef, useState, useTransition, type KeyboardEvent } from 'react';
 import { createPostInlineAction } from '@/actions/postActions';
 
 const MAX_LENGTH = 10000;
+const NOTICE_MS = 2500; // "게시되었습니다"를 보여 주는 시간
 
 type Props = {
   // 지금 보고 있는 목록 페이지(0부터). "더보기"로 2페이지 이상을 보는 중이면 게시 후 첫 페이지로 돌아간다.
@@ -17,11 +18,21 @@ export default function PostComposer({ currentPage, resetHref }: Props) {
   const router = useRouter();
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
+  const [notice, setNotice] = useState('');
   const [pending, startTransition] = useTransition();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const empty = text.trim().length === 0;
+
+  function showNotice() {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+    setNotice('게시되었습니다');
+    noticeTimer.current = setTimeout(() => setNotice(''), NOTICE_MS);
+  }
 
   function submit() {
     if (pending || empty) return;
+    setNotice('');
     startTransition(async () => {
       const result = await createPostInlineAction(text);
       if (result.message) {
@@ -30,6 +41,8 @@ export default function PostComposer({ currentPage, resetHref }: Props) {
       }
       setMessage('');
       setText('');
+      showNotice();
+      textareaRef.current?.focus(); // 버튼에 남은 포커스를 입력창으로 돌려 연달아 쓸 수 있게 한다
       if (currentPage > 0) router.replace(resetHref, { scroll: false });
     });
   }
@@ -55,8 +68,12 @@ export default function PostComposer({ currentPage, resetHref }: Props) {
       </label>
       <textarea
         id="post-composer"
+        ref={textareaRef}
         value={text}
-        onChange={(event) => setText(event.target.value)}
+        onChange={(event) => {
+          setText(event.target.value);
+          if (message) setMessage(''); // 다시 입력을 시작하면 이전 오류는 지운다
+        }}
         onKeyDown={onKeyDown}
         rows={3}
         maxLength={MAX_LENGTH}
@@ -81,6 +98,19 @@ export default function PostComposer({ currentPage, resetHref }: Props) {
           {message}
         </p>
       )}
+      {/* 화면 아래쪽에 잠깐 떴다 사라지는 알림(토스트). 클릭을 가로채지 않고(pointer-events-none),
+          헤더/사이드바(z-50)보다 위에 보이도록 z-[60]을 쓴다.
+          알림 칸(role=status)은 항상 존재해야 스크린리더가 내용 변화를 읽어 준다. */}
+      <div
+        role="status"
+        className="pointer-events-none fixed inset-x-0 bottom-6 z-[60] flex justify-center px-4"
+      >
+        {notice && (
+          <p className="animate-in fade-in slide-in-from-bottom-2 rounded-full bg-[#111827] px-5 py-3 text-sm font-semibold text-white shadow-lg duration-200">
+            {notice}
+          </p>
+        )}
+      </div>
     </form>
   );
 }

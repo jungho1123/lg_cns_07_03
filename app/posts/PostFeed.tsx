@@ -21,6 +21,20 @@ function formatDate(iso: string) {
     parts.find(part => part.type === type)!.value;
   return `${value('year')}-${value('month')}-${value('day')} ${value('hour')}:${value('minute')}`;
 }
+// 24시간 안쪽은 "방금 전 / N분 전 / N시간 전", 24시간이 넘으면 날짜(YYYY-MM-DD)로 표시합니다.
+// 서버 시계가 조금 앞서 시간이 미래로 계산되면(음수) "방금 전"으로 처리합니다.
+function formatRelative(iso: string) {
+  const time = new Date(iso).getTime();
+  if (Number.isNaN(time)) return '';
+  const diff = Date.now() - time;
+  const MINUTE = 60_000;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+  if (diff < MINUTE) return '방금 전';
+  if (diff < HOUR) return `${Math.floor(diff / MINUTE)}분 전`;
+  if (diff < DAY) return `${Math.floor(diff / HOUR)}시간 전`;
+  return formatDate(iso).slice(0, 10);
+}
 type Props = { result: PostReadResult<PostPageResponse>; mine?: boolean };
 type Snapshot = { source: Props['result']; pages: Map<number, PostPageResponse> };
 
@@ -57,14 +71,14 @@ export default function PostFeed({ result, mine = false }: Props) {
         {result.status === 401 ? <Link className="cursor-pointer border-0 bg-transparent p-0 text-[#1d4ed8] underline [font:inherit] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4" href="/login">로그인하기</Link> :
           <button type="button" disabled={pending} onClick={() => startTransition(() => router.refresh())} className="cursor-pointer border-0 bg-transparent p-0 text-[#1d4ed8] underline [font:inherit] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4">다시 시도</button>}
       </div>}
-      {latest && posts.length === 0 && <p className="rounded-2xl border border-[#e5e7eb] bg-white p-6 [overflow-wrap:anywhere]">{mine ? '아직 작성한 게시글이 없습니다.' : '표시할 게시글이 없습니다.'}</p>}
+      {latest && posts.length === 0 && <p className="rounded-2xl border border-[#e5e7eb] bg-white p-6 [overflow-wrap:anywhere]">{mine ? '아직 쓴 글이 없어요. 위 상자에서 첫 글을 남겨 보세요.' : '아직 올라온 글이 없어요. 위 상자에 첫 글을 남겨 보세요.'}</p>}
       {posts.length > 0 && <ul className="m-0 flex list-none flex-col gap-4 p-0">{posts.map(post => (
         <li key={post.id}>
           {/* 카드 전체가 클릭되도록 relative로 두고, 아래 상세 링크가 after로 카드 전체를 덮는다(링크는 하나라서 중첩되지 않는다) */}
           <article className="relative flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] transition-colors hover:bg-[#f9fafb] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[#2563eb] max-[480px]:rounded-[20px] max-[480px]:p-5">
             <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
               <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
-              <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-[#6b7280]" dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></div>
+              <div><p className="font-semibold">{post.author.name}</p>{/* 상대 시간은 서버와 브라우저가 그리는 시각이 달라질 수 있어 suppressHydrationWarning을 쓴다. 마우스를 올리면 정확한 시각이 보인다 */}<time className="text-sm text-[#6b7280]" dateTime={post.createdAt} title={formatDate(post.createdAt)} suppressHydrationWarning>{formatRelative(post.createdAt)}</time></div>
             </header>
             {post.title?.trim() ? <>
               <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim()}</Link></h2>
@@ -73,6 +87,12 @@ export default function PostFeed({ result, mine = false }: Props) {
               // 제목이 없는 글(텍스트박스로 쓴 글): 내용이 곧 본문이라 제목 줄 없이 내용 자체를 상세 링크로 보여 준다
               <p className="line-clamp-3 text-base leading-7 whitespace-pre-wrap text-[#111827] [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.content}</Link></p>
             )}
+            {/* 좋아요 수, 댓글 수 (0이어도 표시). 아이콘은 읽지 않고 숨은 문장으로 뜻을 전달한다 */}
+            <div className="flex items-center gap-4 text-sm text-[#6b7280]">
+              <span className="sr-only">좋아요 {post.likeCount}개, 댓글 {post.commentCount}개</span>
+              <span aria-hidden="true">♡ {post.likeCount}</span>
+              <span aria-hidden="true">💬 {post.commentCount}</span>
+            </div>
           </article>
         </li>
       ))}</ul>}
