@@ -43,14 +43,60 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-[#fafaf6] text-[#1f1f1d]">
       <style>{`
+        /* ── 눈 (0의 구멍 위에 얹는 영역) ── */
+        .nf-eye {
+          --ew: 0.22em; /* 눈 영역 너비 (0의 구멍보다 살짝 크게) */
+          --eh: 0.6em;  /* 눈 영역 높이 */
+          --cx: 0.03em; /* 구멍 가로 중심 보정 (letter-spacing 때문에 생기는 쏠림 보정) */
+          --cy: 0.05em;    /* 구멍 세로 중심 보정 */
+          position: absolute;
+          left: calc(50% + var(--cx));
+          top: calc(50% + var(--cy));
+          width: var(--ew);
+          height: var(--eh);
+          margin: calc(var(--eh) / -2) 0 0 calc(var(--ew) / -2);
+          border-radius: 50%;
+          overflow: hidden;
+          pointer-events: none;
+        }
+ 
+        /* ── 눈꺼풀: 숫자와 같은 색이라 0과 자연스럽게 이어져요 ── */
+        .nf-lid {
+          position: absolute;
+          left: -6%;
+          width: 112%;
+          height: 58%;
+          background: #1f1f1d;
+        }
+        .nf-lid-top {
+          top: 0;
+          border-radius: 0 0 50% 50% / 0 0 22% 22%;
+          transform: translateY(-86%); /* 평소엔 윗눈꺼풀이 살짝 내려와 있어요 */
+          animation: nf-lid-top 5s ease-in-out infinite;
+        }
+        .nf-lid-bottom {
+          bottom: 0;
+          border-radius: 50% 50% 0 0 / 22% 22% 0 0;
+          transform: translateY(104%);
+          animation: nf-lid-bottom 5s ease-in-out infinite;
+        }
+        @keyframes nf-lid-top {
+          0%, 88%, 100% { transform: translateY(-86%); }
+          91%, 93% { transform: translateY(6%); }
+        }
+        @keyframes nf-lid-bottom {
+          0%, 88%, 100% { transform: translateY(104%); }
+          91%, 93% { transform: translateY(-6%); }
+        }
+ 
+        /* ── 눈동자 ── */
         .nf-pupil {
           --x: 0;
           --y: 0;
-          --s: 0.1em;   /* 눈동자 크기 */
-          --cx: 0.03em; /* 0 안쪽 구멍의 가로 중심 보정 (letter-spacing 때문에 생기는 쏠림 보정) */
-          --cy: 0em;    /* 세로 중심 보정 */
-          left: calc(50% + var(--cx));
-          top: calc(50% + var(--cy));
+          --s: 0.1em; /* 눈동자 크기 */
+          position: absolute;
+          left: 50%;
+          top: 50%;
           width: var(--s);
           height: var(--s);
           margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
@@ -96,6 +142,7 @@ export default function NotFound() {
         @media (prefers-reduced-motion: reduce) {
           .nf-pupil[data-active='false'] { animation: none; }
           .nf-pupil { transition: none; }
+          .nf-lid-top, .nf-lid-bottom { animation: none; }
         }
       `}</style>
  
@@ -116,14 +163,18 @@ export default function NotFound() {
           <span aria-hidden="true">4</span>
           <span ref={zeroRef} aria-hidden="true" className="relative inline-block">
             0
-            {/* 0 안에서 길을 찾는 눈동자 */}
-            <span
-              ref={pupilRef}
-              data-active="false"
-              data-shape={PUPIL_SHAPE}
-              style={{ backgroundColor: PUPIL_COLOR }}
-              className="nf-pupil pointer-events-none absolute"
-            />
+            {/* 0 안에서 길을 찾는 눈: 눈동자 + 눈꺼풀 */}
+            <span className="nf-eye" aria-hidden="true">
+              <span
+                ref={pupilRef}
+                data-active="false"
+                data-shape={PUPIL_SHAPE}
+                style={{ backgroundColor: PUPIL_COLOR }}
+                className="nf-pupil"
+              />
+              <span className="nf-lid nf-lid-top" />
+              <span className="nf-lid nf-lid-bottom" />
+            </span>
           </span>
           <span aria-hidden="true">4</span>
         </h1>
