@@ -1,6 +1,7 @@
 import { AuthExpiredError, AuthRefreshRequiredError, publicErrorMessage } from "@/lib/apiError";
 import { getComments } from "@/service/spring/commentService";
 import type { CommentItem } from "@/types/response/commentResponse";
+import CommentForm from "./CommentForm";
 
 // 서버가 UTC로 돌아도(Vercel) 한국 시간으로 보이게 timeZone을 고정
 function formatDate(iso: string) {
@@ -56,6 +57,9 @@ export default async function CommentList({ postId }: CommentListProps) {
           ))}
         </ul>
       )}
+
+      {/* 목록 조회가 로그인한 사람만 되므로, 여기까지 왔으면 로그인 상태다 */}
+      <CommentForm postId={postId} />
     </section>
   );
 }
