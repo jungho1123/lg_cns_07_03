@@ -1,63 +1,30 @@
-'use client';
+import { Suspense } from 'react';
+import { LoginSection } from '@/features/auth/containers/LoginSection';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
-import { loginAction } from '@/actions/authActions';
-import { validateLogin } from '@/lib/auth/validation';
+type LoginPageProps = {
+  searchParams: Promise<{ logout?: string }>;
+};
 
-export default function LoginPage() {
-  const [state, action, pending] = useActionState(loginAction, { message: '' });
-  const [clientMessage, setClientMessage] = useState('');
-  const submitting = useRef(false);
-
-  useEffect(() => {
-    if (!pending) submitting.current = false;
-  }, [pending, state]);
+async function LogoutNotice({ searchParams }: LoginPageProps) {
+  const { logout } = await searchParams;
+  if (logout !== 'server-error') return null;
 
   return (
-    <main>
-      <h1>로그인</h1>
-      <form
-        noValidate
-        action={action}
-        onSubmit={(event) => {
-          if (pending || submitting.current) {
-            event.preventDefault();
-            return;
-          }
-          const data = new FormData(event.currentTarget);
-          const parsed = validateLogin({
-            email: data.get('email'),
-            password: data.get('password'),
-          });
-          setClientMessage(parsed.ok ? '' : parsed.message);
-          if (!parsed.ok) {
-            event.preventDefault();
-            return;
-          }
-          submitting.current = true;
-        }}
-      >
-        <label htmlFor="email">이메일</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="username"
-          required
-        />
-        <label htmlFor="password">비밀번호</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
-        <button type="submit" disabled={pending} aria-busy={pending}>
-          {pending ? '로그인 중…' : '로그인'}
-        </button>
-        <p role="alert">{clientMessage || state.message}</p>
-      </form>
-    </main>
+    <p role="status" className="mb-4 text-sm text-amber-700">
+      현재 기기에서는 로그아웃되었습니다. 서버 세션 종료는 확인하지 못했습니다.
+    </p>
+  );
+}
+
+export default function Page({ searchParams }: LoginPageProps) {
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <Suspense fallback={null}>
+          <LogoutNotice searchParams={searchParams} />
+        </Suspense>
+        <LoginSection />
+      </div>
+    </div>
   );
 }

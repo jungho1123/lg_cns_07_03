@@ -63,10 +63,10 @@ export async function readApiData<T>(
   if (
     !isRecord(body) ||
     body.success !== true ||
-    typeof body.message !== 'string' ||
-    !('data' in body)
+    typeof body.message !== 'string'
   ) {
     throw new ApiError(502, '서버 응답 형식이 올바르지 않습니다.');
   }
+  // Void 응답은 data를 생략할 수 있다. 필요한 데이터는 각 파서가 검증한다.
   return parseData(body.data);
 }
