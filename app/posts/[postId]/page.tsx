@@ -1,17 +1,11 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { requireCurrentUser } from '@/lib/currentUser';
+import { formatDateTime } from '@/lib/date';
 import { getPost } from '@/service/spring/postReadService';
 import CommentList from './CommentList';
+import PostActions from './PostActions';
 
-// 댓글과 동일하게 한국 시간, 24시간제로 날짜와 시간을 표시합니다.
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    dateStyle: 'short',
-    timeStyle: 'short',
-    hourCycle: 'h23',
-  });
-}
 type Params = Promise<{ postId: string }>;
 async function PostDetail({ params }: { params: Params }) {
   const result = await getPost((await params).postId);
@@ -23,25 +17,47 @@ async function PostDetail({ params }: { params: Params }) {
   );
   const post = result.data;
   const title = post.title?.trim(); // 제목이 없는 글(텍스트박스로 쓴 글)은 제목 줄을 그리지 않는다
+  const edited = Boolean(post.updatedAt && post.updatedAt !== post.createdAt);
+  // 내 글인지: 글 작성자 id와 로그인한 사용자 id를 비교한다. 로그인 정보를 못 읽으면 "내 글 아님"으로 둔다.
+  // (버튼을 숨기는 것은 편의일 뿐이고, 실제 권한 판단은 서버가 한다.)
+  let isMine = false;
+  try {
+    isMine = (await requireCurrentUser()).userId === post.author.id;
+  } catch {
+    isMine = false;
+  }
   return (
     <article className="space-y-5 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <header className="space-y-4">
         {title && <h2 className="break-words text-2xl font-bold">{title}</h2>}
-        <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
-          <div><p className="font-semibold">{post.author.name}</p>
-            <p className="text-sm text-gray-500">작성 <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></p>
-            {post.updatedAt && post.updatedAt !== post.createdAt && <p className="text-sm text-gray-500">수정 <time dateTime={post.updatedAt}>{formatDate(post.updatedAt)}</time></p>}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
+            <div className="min-w-0"><p className="font-semibold">{post.author.name}</p>
+              {/* 작성 시각 한 줄. 수정된 글이면 "· 수정됨"을 붙이고, 마우스를 올리면 수정 시각이 보인다 */}
+              <p className="text-sm text-gray-500">
+                <time dateTime={post.createdAt}>{formatDateTime(post.createdAt)}</time>
+                {edited && post.updatedAt && <span title={`수정 ${formatDateTime(post.updatedAt)}`}> · 수정됨</span>}
+              </p>
+            </div>
           </div>
+          {/* 내 글일 때만 오른쪽에 수정/삭제 버튼 (아직 모양만 있고 동작은 연결 전) */}
+          {isMine && <PostActions />}
         </div>
       </header>
       <div className={`whitespace-pre-wrap break-words border-t border-gray-100 pt-5 ${title ? 'leading-7' : 'text-lg leading-8'}`}>{post.content}</div>
-      <div className="[&>section>ul]:space-y-2 [&>section>ul>li]:rounded-xl [&>section>ul>li]:bg-slate-50 [&>section>ul>li]:p-4 [&>section>p:not([role])]:rounded-xl [&>section>p:not([role])]:bg-slate-50 [&>section>p:not([role])]:p-4">
+      {/* 좋아요 수, 댓글 수 (목록 카드와 같은 모양). 아이콘은 읽지 않고 숨은 문장으로 뜻을 전달한다 */}
+      <div className="flex items-center gap-4 text-sm text-gray-500">
+        <span className="sr-only">좋아요 {post.likeCount}개, 댓글 {post.commentCount}개</span>
+        <span aria-hidden="true">♡ {post.likeCount}</span>
+        <span aria-hidden="true">💬 {post.commentCount}</span>
+      </div>
+      <div className="[&>section>ul]:space-y-3 [&>section>ul>li]:rounded-xl [&>section>ul>li]:bg-slate-50 [&>section>ul>li]:p-4 [&>section>p:not([role])]:rounded-xl [&>section>p:not([role])]:bg-slate-50 [&>section>p:not([role])]:p-4">
         <Suspense fallback={<p role="status">댓글을 불러오는 중...</p>}>
           <CommentList postId={post.id} />
         </Suspense>
       </div>
-      {/* 게시글 수정·삭제·좋아요는 각 담당자의 구현 후 연결합니다. */}
+      {/* 게시글 수정·삭제 버튼은 위 헤더에 모양만 있고 동작은 연결 전이다. 좋아요는 구현 후 연결한다. */}
     </article>
   );
 }
@@ -49,10 +65,9 @@ export default function PostDetailPage({ params }: { params: Params }) {
   return (
     <main className="min-h-dvh px-4 py-10 text-gray-900" style={{ backgroundColor: '#ffffff' }}>
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <header className="flex items-end justify-between gap-4">
-          <div className="space-y-2"><h1 className="text-3xl font-bold">게시글 상세</h1><p className="text-sm text-gray-600">글 내용을 확인해 보세요.</p></div>
-          <Link href="/posts" className="shrink-0 text-sm font-semibold text-blue-700 hover:underline">목록으로</Link>
-        </header>
+        {/* 화면에는 보이지 않지만 스크린리더가 화면 제목을 읽을 수 있게 둔다 */}
+        <h1 className="sr-only">게시글 상세</h1>
+        <Link href="/posts" className="w-fit text-sm font-semibold text-blue-700 hover:underline">← 목록으로</Link>
         <Suspense fallback={<p role="status">글을 불러오는 중...</p>}><PostDetail params={params} /></Suspense>
       </div>
     </main>

@@ -4,23 +4,9 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { formatDateTime } from '@/lib/date';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
-// 한국 시간, 24시간제로 YYYY-MM-DD HH:mm 형식을 표시합니다.
-function formatDate(iso: string) {
-  const parts = new Intl.DateTimeFormat('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).formatToParts(new Date(iso));
-  const value = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find(part => part.type === type)!.value;
-  return `${value('year')}-${value('month')}-${value('day')} ${value('hour')}:${value('minute')}`;
-}
 // 24시간 안쪽은 "방금 전 / N분 전 / N시간 전", 24시간이 넘으면 날짜(YYYY-MM-DD)로 표시합니다.
 // 서버 시계가 조금 앞서 시간이 미래로 계산되면(음수) "방금 전"으로 처리합니다.
 function formatRelative(iso: string) {
@@ -33,7 +19,7 @@ function formatRelative(iso: string) {
   if (diff < MINUTE) return '방금 전';
   if (diff < HOUR) return `${Math.floor(diff / MINUTE)}분 전`;
   if (diff < DAY) return `${Math.floor(diff / HOUR)}시간 전`;
-  return formatDate(iso).slice(0, 10);
+  return formatDateTime(iso).slice(0, 10);
 }
 type Props = { result: PostReadResult<PostPageResponse>; mine?: boolean };
 type Snapshot = { source: Props['result']; pages: Map<number, PostPageResponse> };
@@ -78,7 +64,7 @@ export default function PostFeed({ result, mine = false }: Props) {
           <article className="relative flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] transition-colors hover:bg-[#f9fafb] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[#2563eb] max-[480px]:rounded-[20px] max-[480px]:p-5">
             <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
               <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
-              <div><p className="font-semibold">{post.author.name}</p>{/* 상대 시간은 서버와 브라우저가 그리는 시각이 달라질 수 있어 suppressHydrationWarning을 쓴다. 마우스를 올리면 정확한 시각이 보인다 */}<time className="text-sm text-[#6b7280]" dateTime={post.createdAt} title={formatDate(post.createdAt)} suppressHydrationWarning>{formatRelative(post.createdAt)}</time></div>
+              <div><p className="font-semibold">{post.author.name}</p>{/* 상대 시간은 서버와 브라우저가 그리는 시각이 달라질 수 있어 suppressHydrationWarning을 쓴다. 마우스를 올리면 정확한 시각이 보인다 */}<time className="text-sm text-[#6b7280]" dateTime={post.createdAt} title={formatDateTime(post.createdAt)} suppressHydrationWarning>{formatRelative(post.createdAt)}</time></div>
             </header>
             {post.title?.trim() ? <>
               <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim()}</Link></h2>
