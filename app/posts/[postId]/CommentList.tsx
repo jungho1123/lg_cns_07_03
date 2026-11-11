@@ -1,13 +1,6 @@
+import { AuthExpiredError, AuthRefreshRequiredError, publicErrorMessage } from "@/lib/apiError";
+import { getComments } from "@/service/spring/commentService";
 import type { CommentItem } from "@/types/response/commentResponse";
-
-// 임시 데이터. 공통 호출(springFetch)이 올라오면 commentService의 getComments(postId)로 바꾼다.
-function getMockComments(postId: number): CommentItem[] {
-  return [
-    { id: 1, postId, content: "좋은 글이네요!", author: { id: 1, name: "김유빈", avatarUrl: null }, createdAt: "2026-11-10T09:30:00Z" },
-    { id: 2, postId, content: "저도 같은 생각입니다.\n줄바꿈도 보이는지 확인", author: { id: 2, name: "정민철", avatarUrl: null }, createdAt: "2026-11-10T10:05:00Z" },
-    { id: 3, postId, content: "<script>alert(1)</script> 는 글자로만 보여야 함", author: { id: 3, name: "박세진", avatarUrl: null }, createdAt: "2026-11-10T11:20:00Z" },
-  ];
-}
 
 // 서버가 UTC로 돌아도(Vercel) 한국 시간으로 보이게 timeZone을 고정
 function formatDate(iso: string) {
@@ -15,6 +8,7 @@ function formatDate(iso: string) {
     timeZone: "Asia/Seoul",
     dateStyle: "short",
     timeStyle: "short",
+    hourCycle: "h23", // 서버마다 오전/AM 표기가 달라 24시간제로 고정
   });
 }
 
@@ -22,8 +16,24 @@ type CommentListProps = {
   postId: number;
 };
 
-export default function CommentList({ postId }: CommentListProps) {
-  const comments = getMockComments(postId);
+export default async function CommentList({ postId }: CommentListProps) {
+  let comments: CommentItem[] = [];
+  let errorMessage: string | null = null;
+  try {
+    comments = await getComments(postId);
+  } catch (error) {
+    const needLogin = error instanceof AuthExpiredError || error instanceof AuthRefreshRequiredError;
+    errorMessage = needLogin ? "로그인 후 댓글을 볼 수 있습니다." : publicErrorMessage(error);
+  }
+
+  if (errorMessage) {
+    return (
+      <section className="mt-8 border-t pt-6">
+        <h2 className="text-lg font-semibold">댓글</h2>
+        <p role="status" className="mt-4 text-sm text-gray-500">{errorMessage}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-8 border-t pt-6">
