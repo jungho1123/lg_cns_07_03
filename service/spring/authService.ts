@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { matchApiUrl } from '@/config/apiuri';
 import { ApiError } from '@/lib/apiError';
 import { readApiData, springFetch } from '@/lib/fetchClients';
-import type { AuthData, LoginInput } from '@/types/response/authResponse';
+import type {
+  AuthData,
+  LoginInput,
+  SignupInput,
+} from '@/types/response/authResponse';
 
 // 검사만 하고 토큰 원문을 trim하거나 변환하지 않는다.
 const nonemptyText = z.string().refine((value) => value.trim().length > 0);
@@ -16,7 +20,17 @@ const authDataSchema: z.ZodType<AuthData> = z.object({
   userId: z.number(),
   email: z.string(),
   name: z.string(),
-  role: z.enum(['STUDENT', 'MENTOR', 'INSTRUCTOR', 'OPERATOR']),
+  role: z.enum([
+    'STUDENT',
+    'MENTOR',
+    'INSTRUCTOR',
+    'OPERATOR',
+    'PROJECT_MANAGER',
+    'PROJECT_LEADER',
+    'PLANNER',
+    'DESIGNER',
+    'DEVELOPER',
+  ]),
   platformRole: z.enum(['USER', 'COMPANY_ADMIN', 'PLATFORM_ADMIN']),
   avatarUrl: z.string().nullable(),
   presenceStatus: z.enum(['ONLINE', 'AWAY', 'BUSY', 'OFFLINE']),
@@ -46,6 +60,23 @@ export async function refresh(refreshToken: string): Promise<AuthData> {
   const response = await springFetch(matchApiUrl.auth.refresh, {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
+  });
+  return readApiData(response, parseAuthData);
+}
+export async function logout(accessToken: string): Promise<void> {
+  const response = await springFetch(matchApiUrl.auth.logout, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  await readApiData(response, () => undefined);
+}
+
+export async function signup(input: SignupInput): Promise<AuthData> {
+  const response = await springFetch(matchApiUrl.auth.signup, {
+    method: 'POST',
+    body: JSON.stringify(input),
   });
   return readApiData(response, parseAuthData);
 }
