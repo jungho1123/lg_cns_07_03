@@ -34,7 +34,7 @@ export const config = {
   // 로그인 필수 경로만 추가한다. 빈 배열이면 인증 프록시를 적용하지 않는다.
   // Next.js가 정적으로 분석하므로 경로는 이 파일에 직접 작성한다.
   matcher: [
-    // '/posts/:path*', // 게시글 전체
+    '/posts/:path*', // 게시글 전체
     // '/posts/new', // 게시글 작성
     // '/posts/:postId/edit', // 게시글 수정
   ],

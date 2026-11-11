@@ -1,19 +1,10 @@
 import { AuthExpiredError, AuthRefreshRequiredError, publicErrorMessage } from "@/lib/apiError";
 import { requireCurrentUser } from "@/lib/currentUser";
+import { formatDateTime } from "@/lib/date";
 import { getComments } from "@/service/spring/commentService";
 import type { CommentItem } from "@/types/response/commentResponse";
 import CommentDeleteButton from "./CommentDeleteButton";
 import CommentForm from "./CommentForm";
-
-// 서버가 UTC로 돌아도(Vercel) 한국 시간으로 보이게 timeZone을 고정
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("ko-KR", {
-    timeZone: "Asia/Seoul",
-    dateStyle: "short",
-    timeStyle: "short",
-    hourCycle: "h23", // 서버마다 오전/AM 표기가 달라 24시간제로 고정
-  });
-}
 
 type CommentListProps = {
   postId: number;
@@ -47,19 +38,28 @@ export default async function CommentList({ postId }: CommentListProps) {
       {comments.length === 0 ? (
         <p className="mt-4 text-sm text-gray-500">첫 댓글을 남겨 보세요.</p>
       ) : (
-        <ul className="mt-4 space-y-4">
+        <ul className="mt-4 space-y-3">
           {comments.map((comment) => (
-            <li key={comment.id}>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium">{comment.author.name}</span>
-                <time dateTime={comment.createdAt} className="text-gray-500">
-                  {formatDate(comment.createdAt)}
-                </time>
-                {comment.author.id === myUserId && (
-                  <CommentDeleteButton postId={postId} commentId={comment.id} />
-                )}
+            <li key={comment.id} className="flex gap-3">
+              {/* 글 작성자와 같은 이니셜 원형 (작게) */}
+              <span
+                aria-hidden="true"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-800"
+              >
+                {comment.author.name.trim().slice(0, 1) || "?"}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-medium">{comment.author.name}</span>
+                  <time dateTime={comment.createdAt} className="text-gray-500">
+                    {formatDateTime(comment.createdAt)}
+                  </time>
+                  {comment.author.id === myUserId && (
+                    <CommentDeleteButton postId={postId} commentId={comment.id} />
+                  )}
+                </div>
+                <p className="mt-1 whitespace-pre-wrap break-words">{comment.content}</p>
               </div>
-              <p className="mt-1 whitespace-pre-wrap break-words">{comment.content}</p>
             </li>
           ))}
         </ul>

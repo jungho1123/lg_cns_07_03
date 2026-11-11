@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { auth } from "@/auth";
-import { logoutAction } from "@/actions/authActions";
 import MainLayoutClient from "./MainLayoutClient";
 
 interface MainLayoutProps {
@@ -23,7 +22,6 @@ export default async function MainLayout({
   return (
     <MainLayoutClient
       user={user}
-      onLogout={logoutAction}
       barePaths={barePaths}
     >
       {children}

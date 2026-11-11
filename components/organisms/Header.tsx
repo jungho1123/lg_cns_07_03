@@ -4,16 +4,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import type { Session } from "next-auth";
+import { LogoutButton } from "@/components/atoms/LogoutButton";
+import NotificationBell from "@/components/organisms/NotificationBell";
 
 interface HeaderProps {
   onMenuClick: () => void;
-  onLogout: () => Promise<void>;
   user: Session["user"] | null;
 }
 
 export default function Header({
   onMenuClick,
-  onLogout,
   user,
 }: HeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -65,29 +65,8 @@ export default function Header({
       {/* 오른쪽 영역 */}
       <div className="flex items-center gap-3">
 
-        {/* 알림 버튼 */}
-        <button
-          type="button"
-          className="relative rounded-full p-2 hover:bg-gray-100"
-          aria-label="알림"
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-            <path d="M10 21h4" />
-          </svg>
-
-          {/* 읽지 않은 알림 표시 */}
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
-        </button>
+        {/* 알림 종: 로그인했을 때만 보인다. 안 읽은 알림 숫자와 목록은 NotificationBell이 처리한다 */}
+        {isLoggedIn && <NotificationBell />}
 
         {/* 프로필 버튼 및 드롭다운 */}
         <div className="relative">
@@ -147,16 +126,10 @@ export default function Header({
                     계정 설정
                   </Link>
 
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsProfileOpen(false);
-                      await onLogout();
-                    }}
-                    className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                  >
-                    로그아웃
-                  </button>
+                  <LogoutButton
+                    variant="ghost"
+                    className="h-auto w-full justify-start px-3 py-2 font-normal text-red-600 hover:bg-red-50 hover:text-red-600"
+                  />
                 </>
               ) : (
                 <>
