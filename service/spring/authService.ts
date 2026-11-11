@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { matchApiUrl } from '@/config/apiuri';
 import { ApiError } from '@/lib/apiError';
 import { readApiData, springFetch } from '@/lib/fetchClients';
-import type { AuthData, LoginInput } from '@/types/response/authResponse';
+import type {
+  AuthData,
+  LoginInput,
+  SignupInput,
+} from '@/types/response/authResponse';
 
 // 검사만 하고 토큰 원문을 trim하거나 변환하지 않는다.
 const nonemptyText = z.string().refine((value) => value.trim().length > 0);
@@ -46,6 +50,23 @@ export async function refresh(refreshToken: string): Promise<AuthData> {
   const response = await springFetch(matchApiUrl.auth.refresh, {
     method: 'POST',
     body: JSON.stringify({ refreshToken }),
+  });
+  return readApiData(response, parseAuthData);
+}
+export async function logout(accessToken: string): Promise<void> {
+  const response = await springFetch(matchApiUrl.auth.logout, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  await readApiData(response, () => undefined);
+}
+
+export async function signup(input: SignupInput): Promise<AuthData> {
+  const response = await springFetch(matchApiUrl.auth.signup, {
+    method: 'POST',
+    body: JSON.stringify(input),
   });
   return readApiData(response, parseAuthData);
 }

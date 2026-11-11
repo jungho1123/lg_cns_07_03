@@ -2,9 +2,11 @@
 
 import { AuthError } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { signIn, signOut } from '@/auth';
+import { signIn, signOut, unstable_update } from '@/auth';
 import { LoginRejected } from '@/lib/auth/loginError';
 import { validateLogin } from '@/lib/auth/validation';
+import { requireAuthToken } from '@/lib/currentUser';
+import { logout as springLogout } from '@/service/spring/authService';
 
 export async function loginAction(
   _previous: { message: string },
@@ -31,6 +33,25 @@ export async function loginAction(
   redirect('/posts');
 }
 
-export async function logoutAction(): Promise<void> {
-  await signOut({ redirectTo: '/login' });
+export async function logoutAction(_previous: {
+  message: string;
+}): Promise<{ message: string }> {
+  try {
+    const session = await unstable_update({});
+    if (session?.authError) {
+      return {
+        message:
+          '인증이 만료되어 서버 로그아웃을 수행 할 수 없습니다. 다시 로그인후 로그아웃을 시도해 주세요.',
+      };
+    }
+    if (session) {
+      const { accessToken } = await requireAuthToken();
+      await springLogout(accessToken);
+    }
+  } catch {
+    return {
+      message: '서버 로그아웃 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+    };
+  }
+  return signOut({ redirectTo: '/login' });
 }
