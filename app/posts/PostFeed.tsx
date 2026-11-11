@@ -4,23 +4,9 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { formatDateTime } from '@/lib/date';
+import { formatDateTime, formatRelative } from '@/lib/date';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
-// 24시간 안쪽은 "방금 전 / N분 전 / N시간 전", 24시간이 넘으면 날짜(YYYY-MM-DD)로 표시합니다.
-// 서버 시계가 조금 앞서 시간이 미래로 계산되면(음수) "방금 전"으로 처리합니다.
-function formatRelative(iso: string) {
-  const time = new Date(iso).getTime();
-  if (Number.isNaN(time)) return '';
-  const diff = Date.now() - time;
-  const MINUTE = 60_000;
-  const HOUR = 60 * MINUTE;
-  const DAY = 24 * HOUR;
-  if (diff < MINUTE) return '방금 전';
-  if (diff < HOUR) return `${Math.floor(diff / MINUTE)}분 전`;
-  if (diff < DAY) return `${Math.floor(diff / HOUR)}시간 전`;
-  return formatDateTime(iso).slice(0, 10);
-}
 type Props = { result: PostReadResult<PostPageResponse>; mine?: boolean };
 type Snapshot = { source: Props['result']; pages: Map<number, PostPageResponse> };
 

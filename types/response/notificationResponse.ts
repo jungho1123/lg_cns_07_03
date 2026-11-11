@@ -22,14 +22,14 @@ export type NotificationItem = {
   recipientId: number; // 알림을 받는 사람
   actorId: number; // 행동한 사람
   actorName: string;
-  projectId: number;
-  type: NotificationType;
+  projectId: number | null; // [확인됨] 게시판 알림은 null
+  type: string; // 알려진 값은 NotificationType. 서버가 새 종류를 추가해도 깨지지 않게 string으로 받는다
   resourceType: string; // 대상 종류 (확인 필요: 어떤 값들이 오는지)
   resourceId: string; // 대상 ID
   title: string; // 서버가 만든 제목 (그대로 표시)
   body: string; // 서버가 만든 내용 (그대로 표시)
-  linkPath: string; // 클릭 시 이동할 경로 (확인 필요: 우리 앱 경로와 맞는지)
-  readAt: string | null; // 읽은 시각 (확인 필요: 안 읽음일 때 null인지)
+  linkPath: string; // 클릭 시 이동할 경로 [확인됨] 댓글은 /posts/16, 채팅은 /dm?... (우리 앱에 없음)
+  readAt: string | null; // 읽은 시각 [확인됨] 안 읽음이면 null
   createdAt: string; // ISO 8601 날짜 문자열
   unread: boolean;
 };
