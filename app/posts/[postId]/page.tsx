@@ -1,7 +1,17 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { getPost } from '@/service/spring/postReadService';
+import CommentList from './CommentList';
 
+// 댓글과 동일하게 한국 시간, 24시간제로 날짜와 시간을 표시합니다.
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    dateStyle: 'short',
+    timeStyle: 'short',
+    hourCycle: 'h23',
+  });
+}
 type Params = Promise<{ postId: string }>;
 async function PostDetail({ params }: { params: Params }) {
   const result = await getPost((await params).postId);
@@ -19,13 +29,18 @@ async function PostDetail({ params }: { params: Params }) {
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
           <div><p className="font-semibold">{post.author.name}</p>
-            <p className="text-sm text-gray-500">작성 <time dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></p>
-            {post.updatedAt && post.updatedAt !== post.createdAt && <p className="text-sm text-gray-500">수정 <time dateTime={post.updatedAt}>{post.updatedAt.slice(0, 10)}</time></p>}
+            <p className="text-sm text-gray-500">작성 <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></p>
+            {post.updatedAt && post.updatedAt !== post.createdAt && <p className="text-sm text-gray-500">수정 <time dateTime={post.updatedAt}>{formatDate(post.updatedAt)}</time></p>}
           </div>
         </div>
       </header>
       <div className="whitespace-pre-wrap break-words border-t border-gray-100 pt-5 leading-7">{post.content}</div>
-      {/* 댓글·수정·삭제·좋아요 컴포넌트는 각 담당자의 구현 후 협의하여 연결합니다. */}
+      <div className="[&>section>ul]:space-y-2 [&>section>ul>li]:rounded-xl [&>section>ul>li]:bg-slate-50 [&>section>ul>li]:p-4 [&>section>p:not([role])]:rounded-xl [&>section>p:not([role])]:bg-slate-50 [&>section>p:not([role])]:p-4">
+        <Suspense fallback={<p role="status">댓글을 불러오는 중...</p>}>
+          <CommentList postId={post.id} />
+        </Suspense>
+      </div>
+      {/* 게시글 수정·삭제·좋아요는 각 담당자의 구현 후 연결합니다. */}
     </article>
   );
 }

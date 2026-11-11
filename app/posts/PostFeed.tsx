@@ -6,6 +6,21 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
+// 한국 시간, 24시간제로 YYYY-MM-DD HH:mm 형식을 표시합니다.
+function formatDate(iso: string) {
+  const parts = new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(iso));
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find(part => part.type === type)!.value;
+  return `${value('year')}-${value('month')}-${value('day')} ${value('hour')}:${value('minute')}`;
+}
 type Props = { result: PostReadResult<PostPageResponse>; mine?: boolean };
 type Snapshot = { source: Props['result']; pages: Map<number, PostPageResponse> };
 
@@ -48,7 +63,7 @@ export default function PostFeed({ result, mine = false }: Props) {
           <article className="flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] max-[480px]:rounded-[20px] max-[480px]:p-5">
             <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
               <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
-              <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-[#6b7280]" dateTime={post.createdAt}>{post.createdAt.slice(0, 10)}</time></div>
+              <div><p className="font-semibold">{post.author.name}</p><time className="text-sm text-[#6b7280]" dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></div>
             </header>
             <h2 className="text-xl leading-[1.4] font-bold [overflow-wrap:anywhere]"><Link className="text-inherit no-underline hover:underline focus-visible:outline-2 focus-visible:outline-[#2563eb] focus-visible:outline-offset-4" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.title?.trim() || '게시글 보기'}</Link></h2>
             <p className="line-clamp-3 text-sm leading-7 whitespace-pre-wrap text-[#4b5563] [overflow-wrap:anywhere]">{post.content}</p>
