@@ -16,6 +16,10 @@ export const matchApiUrl = {
     list: (postId: number) => `/api/v1/posts/${postId}/comments`,
     detail: (postId: number, commentId: number) =>
       `/api/v1/posts/${postId}/comments/${commentId}`,
+    // 좋아요는 POST 한 번에 누르기/취소가 번갈아 된다(토글)
+    like: (postId: number, commentId: number) =>
+      `/api/v1/posts/${postId}/comments/${commentId}/likes`,
+    likedByMe: (postId: number) => `/api/v1/posts/${postId}/comments/likes/me`,
   },
   // 알림: 목록은 ?limit=50 처럼 개수를 붙여서 부른다
   notification: {
