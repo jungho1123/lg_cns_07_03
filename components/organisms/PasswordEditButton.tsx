@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useId, useState, type ReactNode } from "react";
+import { useActionState, useId, useState } from "react";
 import { changePasswordAction } from "@/actions/passwordActions";
 import type { PasswordChangeState } from "@/types/response/passwordResponse";
 
@@ -41,14 +41,11 @@ function PasswordForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default function PasswordEditButton({ children }: { children: ReactNode }) {
+export default function PasswordEditButton() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,384px)] xl:gap-8">
-      <div className="min-w-0">
-        {children}
-        <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className="mt-5 cursor-pointer rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 active:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">비밀번호 수정</button>
-      </div>
+    <div className="mt-5 grid min-w-0 items-start justify-items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,384px)] xl:gap-8">
+      <button type="button" onClick={() => setOpen(true)} aria-expanded={open} className="cursor-pointer rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 active:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">비밀번호 수정</button>
       {open && <PasswordForm onClose={() => setOpen(false)} />}
     </div>
   );
