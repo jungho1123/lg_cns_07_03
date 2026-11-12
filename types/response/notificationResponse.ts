@@ -5,6 +5,7 @@
 export type NotificationType =
   | "CHAT_MESSAGE"
   | "POST_CREATED"
+  | "POST_LIKED" // [확인됨] 글 좋아요 알림 (body는 null)
   | "COMMENT_CREATED"
   | "COUNSELING_REQUESTED"
   | "COUNSELING_ACCEPTED"

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { formatDateTime, formatRelative } from '@/lib/date';
+import PostLikeButton from './PostLikeButton';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
 type Props = { result: PostReadResult<PostPageResponse>; mine?: boolean };
@@ -59,10 +60,10 @@ export default function PostFeed({ result, mine = false }: Props) {
               // 제목이 없는 글(텍스트박스로 쓴 글): 내용이 곧 본문이라 제목 줄 없이 내용 자체를 상세 링크로 보여 준다
               <p className="line-clamp-3 text-base leading-7 whitespace-pre-wrap text-[#111827] [overflow-wrap:anywhere]"><Link className="text-inherit no-underline outline-none after:absolute after:inset-0 after:content-[''] hover:underline" href={`/posts/${encodeURIComponent(String(post.id))}`}>{post.content}</Link></p>
             )}
-            {/* 좋아요 수, 댓글 수 (0이어도 표시). 아이콘은 읽지 않고 숨은 문장으로 뜻을 전달한다 */}
+            {/* 좋아요 버튼과 댓글 수 (0이어도 표시). 좋아요 버튼은 카드 링크 위에 떠서 눌러도 상세로 이동하지 않는다 */}
             <div className="flex items-center gap-4 text-sm text-[#6b7280]">
-              <span className="sr-only">좋아요 {post.likeCount}개, 댓글 {post.commentCount}개</span>
-              <span aria-hidden="true">♡ {post.likeCount}</span>
+              <PostLikeButton postId={post.id} likeCount={post.likeCount} likedByMe={post.likedByMe} />
+              <span className="sr-only">댓글 {post.commentCount}개</span>
               <span aria-hidden="true">💬 {post.commentCount}</span>
             </div>
           </article>
