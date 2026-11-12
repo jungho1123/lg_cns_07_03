@@ -30,20 +30,22 @@ export const RoleSchema = z.enum(
 
 export const signupSchema = z.object({
   email: z
-    .string({ error: ' 공백일 수 없습니다.' })
+    .string({ error: ' 이메일 형식이 올바르지 않습니다.' })
     .trim()
     .min(1, { error: ' 공백일 수 없습니다.' })
     .pipe(z.email({ error: ' 이메일 형식이 올바르지 않습니다.' })),
   name: z
     .string({ error: ' 공백일 수 없습니다.' })
     .trim()
-    .min(1, { error: ' 공백일 수 없습니다.' }),
+    .min(1, { error: ' 공백일 수 없습니다.' })
+    .max(80, { error: ' 이름은 2에서 80자 사이여야 합니다.' }),
   password: z
     .string({ error: ' 공백일 수 없습니다.' })
     .refine((value) => value.trim().length > 0, {
       error: ' 공백일 수 없습니다.',
     })
-    .min(8, { error: '비밀번호는 8자 이상이어야 합니다.' }),
+    .min(8, { error: '크기가 8에서 72 사이여야 합니다' })
+    .max(72, { error: '크기가 8에서 72 사이여야 합니다' }),
   role: RoleSchema,
 });
 
