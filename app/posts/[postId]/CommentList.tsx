@@ -5,6 +5,22 @@ import { getComments } from "@/service/spring/commentService";
 import type { CommentItem } from "@/types/response/commentResponse";
 import CommentDeleteButton from "./CommentDeleteButton";
 import CommentForm from "./CommentForm";
+import CommentLikeButton from "./CommentLikeButton";
+import CommentMentionButton from "./CommentMentionButton";
+
+// 본문의 @이름을 굵게 칠한다. 이메일(a@b.com)은 @ 앞이 공백이 아니라서 칠하지 않는다.
+// 글자를 그대로 넣으므로(dangerouslySetInnerHTML 안 씀) 스크립트를 넣어도 글자로만 보인다.
+function withMentions(content: string) {
+  return content.split(/((?<=^|\s)@[^\s@]+)/).map((part, i) =>
+    i % 2 === 1 ? (
+      <span key={i} className="font-semibold text-blue-600">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
 
 type CommentListProps = {
   postId: number;
@@ -54,11 +70,21 @@ export default async function CommentList({ postId }: CommentListProps) {
                   <time dateTime={comment.createdAt} className="text-gray-500">
                     {formatDateTime(comment.createdAt)}
                   </time>
-                  {comment.author.id === myUserId && (
+                  {comment.author.id === myUserId ? (
                     <CommentDeleteButton postId={postId} commentId={comment.id} />
+                  ) : (
+                    <CommentMentionButton name={comment.author.name} />
                   )}
                 </div>
-                <p className="mt-1 whitespace-pre-wrap break-words">{comment.content}</p>
+                <p className="mt-1 whitespace-pre-wrap break-words">{withMentions(comment.content)}</p>
+                <div className="mt-1">
+                  <CommentLikeButton
+                    postId={postId}
+                    commentId={comment.id}
+                    likeCount={comment.likeCount}
+                    likedByMe={comment.likedByMe}
+                  />
+                </div>
               </div>
             </li>
           ))}

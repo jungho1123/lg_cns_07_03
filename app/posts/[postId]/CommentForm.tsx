@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useState, useTransition, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, useTransition, type KeyboardEvent } from 'react';
 import { createCommentAction } from '@/actions/commentActions';
 import { Toast } from '@/components/atoms/Toast';
 import { useNotice } from '@/hooks/useNotice';
+import { MENTION_EVENT } from './CommentMentionButton';
 
 const MAX_LENGTH = 2000; // 서버 액션(commentActions)의 댓글 최대 길이와 같게 맞춘다
 
@@ -14,6 +15,17 @@ export default function CommentForm({ postId }: { postId: number }) {
   const { notice, show, clear } = useNotice();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const empty = text.trim().length === 0;
+
+  // "답글" 버튼 신호를 받으면 맨 앞에 @이름을 넣는다. 이미 다른 @이름이 맨 앞에 있으면 바꿔 끼운다.
+  useEffect(() => {
+    function onMention(event: Event) {
+      const name = (event as CustomEvent<string>).detail;
+      setText((prev) => `@${name} ${prev.replace(/^@\S+\s*/, '')}`.slice(0, MAX_LENGTH));
+      textareaRef.current?.focus();
+    }
+    window.addEventListener(MENTION_EVENT, onMention);
+    return () => window.removeEventListener(MENTION_EVENT, onMention); // 화면을 떠나면 듣기를 멈춘다
+  }, []);
 
   function submit() {
     if (pending || empty) return;
