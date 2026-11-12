@@ -12,6 +12,15 @@ export interface CommentItem {
   content: string;
   author: CommentAuthor;
   createdAt: string; // ISO 8601
+  likeCount: number; // 2026-11-12 실제 응답 확인
+  // 내가 좋아요를 눌렀는지. 명세엔 있지만 실제 응답엔 없어서(2026-11-12 확인)
+  // commentService가 likes/me API로 따로 받아 와 채운다.
+  likedByMe: boolean;
+}
+
+// 이 글에서 내가 좋아요한 댓글 ID 목록 (GET .../comments/likes/me)
+export interface CommentLikedMeResponse {
+  likedCommentIds: number[];
 }
 
 // 댓글 작성 요청 본문. 작성자는 보내지 않는다(서버가 토큰으로 판단)

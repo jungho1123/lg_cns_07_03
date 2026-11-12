@@ -3,7 +3,7 @@
 import { refresh } from 'next/cache';
 import { z } from 'zod';
 import { ApiError, AuthExpiredError, publicErrorMessage } from '@/lib/apiError';
-import { createComment, deleteComment } from '@/service/spring/commentService';
+import { createComment, deleteComment, toggleCommentLike } from '@/service/spring/commentService';
 
 export type CommentFormState = { message: string; content: string };
 
@@ -55,6 +55,26 @@ export async function deleteCommentAction(
     if (error instanceof ApiError && error.status === 403) {
       return { message: '내가 쓴 댓글만 삭제할 수 있습니다.' };
     }
+    return { message: publicErrorMessage(error) };
+  }
+  refresh();
+  return { message: '' };
+}
+
+export type CommentLikeState = { message: string };
+
+// 누르기와 취소를 서버가 알아서 번갈아 처리하므로, 화면은 "눌렀다"만 알리면 된다.
+export async function toggleCommentLikeAction(
+  postId: number,
+  commentId: number,
+): Promise<CommentLikeState> {
+  if (![postId, commentId].every((id) => Number.isSafeInteger(id) && id > 0)) {
+    return { message: '댓글 번호가 올바르지 않습니다.' };
+  }
+  try {
+    await toggleCommentLike(postId, commentId);
+  } catch (error) {
+    if (error instanceof AuthExpiredError) return { message: error.message };
     return { message: publicErrorMessage(error) };
   }
   refresh();
