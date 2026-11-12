@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { ArrowRight, FileText } from "lucide-react";
 import { auth } from "@/auth";
 import ProfileAvatar from "./ProfileAvatar";
@@ -62,6 +63,7 @@ async function MyPosts() {
 }
 
 async function MyPageContent() {
+  await connection();
   const session = await auth();
   if (!session?.user || session.authError) redirect('/login');
   const user = session.user.profile;

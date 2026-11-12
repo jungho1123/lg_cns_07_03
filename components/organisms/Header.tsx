@@ -77,17 +77,9 @@ export default function Header({
             aria-expanded={isProfileOpen}
             aria-label="프로필 메뉴"
           >
-            {isLoggedIn && user?.image ? (
-              <img
-                src={user.image}
-                alt="프로필 이미지"
-                className="h-9 w-9 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
-                {isLoggedIn ? user?.name?.[0] ?? "U" : "U"}
-              </div>
-            )}
+            <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
+              {isLoggedIn ? user?.name?.trim().slice(0, 1) || "U" : "U"}
+            </div>
 
             <span className="hidden text-sm font-medium text-gray-700 sm:block">
               {isLoggedIn ? user?.name ?? "사용자" : "로그인"}
