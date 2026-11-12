@@ -88,7 +88,7 @@ async function MyPageContent() {
           <h1 id="profile-heading" className="text-xl font-bold text-gray-900">프로필</h1>
           <div className="mt-6 grid items-start gap-8 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-12">
             <AvatarEdit key={session.user.id} userId={session.user.id} name={name} />
-            <div className="min-w-0">
+            <PasswordEditButton>
               <dl className="m-0 grid gap-4 text-left">
                 <div className="grid gap-1">
                   <dt className="m-0 text-base leading-6 text-gray-500">사용자 이름</dt>
@@ -99,8 +99,8 @@ async function MyPageContent() {
                   <dd className="m-0 pl-[6px] text-sm leading-6 font-medium break-all text-gray-900">{email}</dd>
                 </div>
               </dl>
-              <PasswordEditButton />
-            </div>
+
+            </PasswordEditButton>
           </div>
 
         </div>
