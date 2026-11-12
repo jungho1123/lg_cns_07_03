@@ -19,6 +19,8 @@ export const matchApiUrl = {
     list: '/api/v1/posts',
     mine: '/api/v1/posts/me',
     detail: (postId: string) => `/api/v1/posts/${encodeURIComponent(postId)}`,
+    // 글 좋아요: POST 한 번에 누르기/취소가 번갈아 된다(토글). 응답은 { liked, likeCount }
+    like: (postId: number) => `/api/v1/posts/${postId}/likes`,
   },
   // [4번 박세진] 목록(GET)과 작성(POST)은 같은 주소, 삭제(DELETE)는 detail
   comment: {
