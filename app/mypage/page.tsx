@@ -7,6 +7,17 @@ import { auth } from "@/auth";
 import ProfileAvatar from "./ProfileAvatar";
 import PasswordEditButton from "./PasswordEditButton";
 import { countMyPosts, listMyPosts } from "@/service/spring/postReadService";
+import MyPageFallback from "@/components/loader/MyPageFallback";
+import PostListFallback from "@/components/loader/PostListFallback";
+
+// 내가 쓴 글 로딩 화면 (글 목록 / 페이지 전체 로딩에서 같이 씀)
+const myPostsFallback = (
+  <div className="flex-1 border-t border-gray-200 bg-gray-50 px-5 py-10 sm:px-8 lg:px-12">
+    <div className="mx-auto mt-16 max-w-5xl">
+      <PostListFallback />
+    </div>
+  </div>
+);
 
 async function MyPostCount() {
   const count = await countMyPosts();
@@ -95,7 +106,7 @@ async function MyPageContent() {
 
         </div>
       </section>
-      <Suspense fallback={<div role="status" className="flex-1 border-t border-gray-200 bg-gray-50 p-10 text-sm text-gray-500">내가 쓴 글을 불러오는 중...</div>}>
+      <Suspense fallback={myPostsFallback}>
         <MyPosts />
       </Suspense>
     </div>
@@ -103,5 +114,16 @@ async function MyPageContent() {
 }
 
 export default function MyPage() {
-  return <Suspense fallback={<p role="status" className="p-10 text-sm text-gray-500">마이페이지를 불러오는 중...</p>}><MyPageContent /></Suspense>;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
+          <MyPageFallback />
+          {myPostsFallback}
+        </div>
+      }
+    >
+      <MyPageContent />
+    </Suspense>
+  );
 }
