@@ -32,8 +32,10 @@ export async function createPost(input: CreatePostInput): Promise<{ id: number }
 }
 
 // updatePost와 deletePost는 서버 액션에서만 쓸 수 있다 (토큰 만료 시 갱신 + Bearer 헤더 첨부)
+// 제목은 선택이다. 작성창으로 쓴 글은 제목이 없어서, 제목 없이 본문만 수정할 수 있어야 한다.
+// (Swagger 확인: 제목 없이 { content }만 보내도 200이고, 제목은 null 그대로 유지된다)
 export const updatePostInputSchema = z.object({
-  title: z.string().trim().min(1, '제목을 입력해 주세요.'),
+  title: z.string().trim().optional(),
   content: z.string().trim().min(1, '본문을 입력해 주세요.'),
 });
 
@@ -92,15 +94,19 @@ export async function updatePost(
 
   const parsedInput = updatePostInputSchema.safeParse(input);
   if (!parsedInput.success) {
-    return { ok: false, status: 400, message: '제목과 본문을 확인해 주세요.' };
+    return { ok: false, status: 400, message: '본문을 확인해 주세요.' };
   }
+
+  // 제목이 비어 있으면 title 키를 아예 보내지 않는다 (빈 문자열을 보냈을 때의 서버 동작은 확인 전이라 피한다)
+  const { title, content } = parsedInput.data;
+  const body = title ? { title, content } : { content };
 
   try {
     const response = await authenticatedRequest(
       matchApiUrl.postRead.detail(postId),
       {
         method: 'PUT',
-        body: JSON.stringify(parsedInput.data),
+        body: JSON.stringify(body),
       },
     );
 
@@ -111,14 +117,7 @@ export async function updatePost(
   }
 }
 
-const deletedSchema = z.object({
-  success: z.literal(true),
-  message: z.string(),
-});
-
-export async function deletePost(
-  postId: string,
-): Promise<PostReadResult<{ message: string }>> {
+export async function deletePost(postId: string): Promise<PostReadResult<null>> {
   if (!/^\d+$/.test(postId)) {
     return { ok: false, status: 400, message: '게시글 번호가 올바르지 않습니다.' };
   }
@@ -129,28 +128,15 @@ export async function deletePost(
       { method: 'DELETE' },
     );
 
-    if (!response.ok) {
-      // 오류 응답은 공통 응답 처리 함수가 ApiError로 변환합니다.
-      await readApiData(response, () => null);
-      return {
-        ok: false,
-        status: 502,
-        message: '삭제 응답을 확인하지 못했습니다.',
-      };
+    if (response.ok) {
+      // 삭제가 끝났으면 응답 내용은 볼 필요가 없다. 본문 모양 때문에 성공이 실패로 보이지 않게 한다.
+      await response.body?.cancel();
+      return { ok: true, data: null };
     }
 
-    const body: unknown = await response.json();
-    const parsed = deletedSchema.safeParse(body);
-
-    if (!parsed.success) {
-      return {
-        ok: false,
-        status: 502,
-        message: '게시글 삭제 응답 형식이 올바르지 않습니다.',
-      };
-    }
-
-    return { ok: true, data: { message: parsed.data.message } };
+    // 실패 응답은 공통 처리 함수가 ApiError(상태 코드 포함)로 바꿔 던지고, 아래 catch가 문구로 바꾼다.
+    await readApiData(response, () => null);
+    return { ok: false, status: response.status, message: '게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.' };
   } catch (error) {
     return mutationError(error, '삭제');
   }

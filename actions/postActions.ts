@@ -4,7 +4,7 @@ import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { AuthExpiredError, publicErrorMessage } from '@/lib/apiError';
-import { createPost } from '@/service/spring/postWriteService';
+import { createPost, deletePost, updatePost } from '@/service/spring/postWriteService';
 
 export type PostFormState = { message: string; title: string; content: string };
 
@@ -66,21 +66,14 @@ export async function createPostInlineAction(content: string): Promise<InlinePos
   return { message: '' };
 }
 
+// 제목은 선택이다 (제목 없는 글도 수정할 수 있어야 한다). 글 번호는 브라우저가 바꿔 보낼 수 있어 다시 확인한다.
 const updatePostActionSchema = z.object({
   postId: z.string().regex(/^\d+$/, '게시글 번호가 올바르지 않습니다.'),
-  title: z
-    .string()
-    .trim()
-    .min(1, '제목을 입력해 주세요.')
-    .max(200, '제목은 200자까지 쓸 수 있습니다.'),
-  content: z
-    .string()
-    .trim()
-    .min(1, '내용을 입력해 주세요.')
-    .max(10000, '내용은 10000자까지 쓸 수 있습니다.'),
+  title: postSchema.shape.title,
+  content: postSchema.shape.content,
 });
 
-// 수정 폼에서 호출하는 서버 액션
+// 수정 폼에서 호출하는 서버 액션. 성공하면 그 글의 상세 화면으로 이동한다.
 export async function updatePostAction(
   _previous: PostFormState,
   formData: FormData,
@@ -102,21 +95,21 @@ export async function updatePostAction(
     };
   }
 
-  const { updatePost } = await import('@/service/spring/postWriteService');
   const result = await updatePost(parsed.data.postId, {
-    title: parsed.data.title,
+    title: parsed.data.title || undefined, // 비어 있으면 제목을 보내지 않는다
     content: parsed.data.content,
   });
 
+  // updatePost는 실패해도 예외를 던지지 않고 { ok: false }를 돌려주므로 꼭 확인한다.
   if (!result.ok) {
     return { message: result.message, title, content };
   }
 
-  // 기존 작성 화면과 수정 폼의 취소 주소에 맞춰 상세 화면으로 이동한다.
+  // redirect는 이동 신호를 예외로 던지므로 try/catch 밖에 둔다.
   redirect(`/posts/${parsed.data.postId}`);
 }
 
-// 삭제 버튼에서 호출한다. 성공 시 빈 메시지를 반환해 버튼이 목록으로 이동하게 한다.
+// 삭제 버튼에서 호출한다. 성공하면 빈 메시지를 돌려주고, 화면이 목록(/posts)으로 이동한다.
 export async function deletePostAction(
   postId: string,
 ): Promise<{ message: string }> {
@@ -129,7 +122,6 @@ export async function deletePostAction(
     return { message: parsedPostId.error.issues[0].message };
   }
 
-  const { deletePost } = await import('@/service/spring/postWriteService');
   const result = await deletePost(parsedPostId.data);
   if (!result.ok) {
     return { message: result.message };
