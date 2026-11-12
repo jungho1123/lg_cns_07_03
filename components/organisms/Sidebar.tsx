@@ -12,7 +12,7 @@ interface SidebarProps {
 const menuItems = [
   { name: "홈", href: "/" },
   { name: "게시글", href: "/posts" },
-  { name: "마이페이지", href: "/profile" },
+  { name: "마이페이지", href: "/mypage" },
   { name: "설정", href: "/settings" },
 ];
 

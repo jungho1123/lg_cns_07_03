@@ -23,7 +23,7 @@ export default function Header({
   const pageTitles: Record<string, string> = {
     "/": "HOME",
     "/posts": "POSTS",
-    "/profile": "MY PAGE",
+    "/mypage": "MY PAGE",
     "/settings": "SETTINGS",
   };
 
@@ -111,7 +111,7 @@ export default function Header({
 
                   {/* 프로필 메뉴 */}
                   <Link
-                    href="/profile"
+                    href="/mypage"
                     onClick={() => setIsProfileOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
