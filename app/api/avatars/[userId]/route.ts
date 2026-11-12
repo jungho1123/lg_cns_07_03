@@ -1,8 +1,6 @@
 import { ApiError, AuthExpiredError } from '@/lib/apiError';
 import { getAvatarImage } from '@/service/avatarService';
 
-export const runtime = 'nodejs';
-
 const imageHeaders = {
   'Cache-Control': 'private, no-store',
   'X-Content-Type-Options': 'nosniff',
