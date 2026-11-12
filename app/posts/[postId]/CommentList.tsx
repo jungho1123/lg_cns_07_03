@@ -2,6 +2,7 @@ import { AuthExpiredError, AuthRefreshRequiredError, publicErrorMessage } from "
 import { requireCurrentUser } from "@/lib/currentUser";
 import { formatDateTime } from "@/lib/date";
 import { getComments } from "@/service/spring/commentService";
+import UserAvatar from "@/components/molecules/UserAvatar";
 import type { CommentItem } from "@/types/response/commentResponse";
 import CommentDeleteButton from "./CommentDeleteButton";
 import CommentForm from "./CommentForm";
@@ -57,13 +58,7 @@ export default async function CommentList({ postId }: CommentListProps) {
         <ul className="mt-4 space-y-3">
           {comments.map((comment) => (
             <li key={comment.id} className="flex gap-3">
-              {/* 글 작성자와 같은 이니셜 원형 (작게) */}
-              <span
-                aria-hidden="true"
-                className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-800"
-              >
-                {comment.author.name.trim().slice(0, 1) || "?"}
-              </span>
+              <UserAvatar userId={comment.author.id} name={comment.author.name} className="size-8 text-sm" sizes="32px" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-medium">{comment.author.name}</span>
