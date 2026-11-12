@@ -57,7 +57,7 @@ export default function MainLayoutClient({
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="min-h-screen min-[1024px]:ml-64 flex flex-col">
+      <div className="min-h-screen min-[1024px]:ml-36 flex flex-col">
         <main className="flex-1 w-full min-w-0">
           {children}
         </main>
