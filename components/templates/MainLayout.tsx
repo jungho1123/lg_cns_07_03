@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { auth } from "@/auth";
+import AvatarProvider from "@/components/providers/AvatarProvider";
 import MainLayoutClient from "./MainLayoutClient";
 
 interface MainLayoutProps {
@@ -20,11 +21,13 @@ export default async function MainLayout({
   const user = session?.user ?? null;
 
   return (
-    <MainLayoutClient
-      user={user}
-      barePaths={barePaths}
-    >
-      {children}
-    </MainLayoutClient>
+    <AvatarProvider key={user?.id ?? "guest"}>
+      <MainLayoutClient
+        user={user}
+        barePaths={barePaths}
+      >
+        {children}
+      </MainLayoutClient>
+    </AvatarProvider>
   );
 }

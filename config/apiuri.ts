@@ -7,6 +7,12 @@ export const matchApiUrl = {
     logout: '/api/v1/auth/logout',
   },
   user: {
+    list: '/api/v1/users',
+    detail: (userId: number) => `/api/v1/users/${userId}`,
+    avatar: {
+      me: '/api/v1/users/me/avatar',
+      detail: (userId: number) => `/api/v1/users/${userId}/avatar`,
+    },
     password: '/api/v1/users/me/password',
   },
   postRead: {
@@ -29,7 +35,8 @@ export const matchApiUrl = {
   // 알림: 목록은 ?limit=50 처럼 개수를 붙여서 부른다
   notification: {
     list: '/api/v1/notifications',
-    read: (notificationId: number) => `/api/v1/notifications/${notificationId}/read`,
+    read: (notificationId: number) =>
+      `/api/v1/notifications/${notificationId}/read`,
     readAll: '/api/v1/notifications/read-all',
   },
 };

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import type { Session } from "next-auth";
 import { LogoutButton } from "@/components/atoms/LogoutButton";
+import UserAvatar from "@/components/molecules/UserAvatar";
 import NotificationBell from "@/components/organisms/NotificationBell";
 
 interface HeaderProps {
@@ -77,9 +78,11 @@ export default function Header({
             aria-expanded={isProfileOpen}
             aria-label="프로필 메뉴"
           >
-            <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
-              {isLoggedIn ? user?.name?.trim().slice(0, 1) || "U" : "U"}
-            </div>
+            {isLoggedIn && user ? (
+              <UserAvatar userId={user.id} name={user.name || "사용자"} className="size-9 text-base" sizes="36px" />
+            ) : (
+              <div aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">U</div>
+            )}
 
             <span className="hidden text-sm font-medium text-gray-700 sm:block">
               {isLoggedIn ? user?.name ?? "사용자" : "로그인"}

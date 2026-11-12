@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { formatDateTime, formatRelative } from '@/lib/date';
+import UserAvatar from '@/components/molecules/UserAvatar';
 import PostLikeButton from './PostLikeButton';
 import type { PostPageResponse, PostReadResult, PostResponse } from '@/types/response/postResponse';
 
@@ -50,7 +51,7 @@ export default function PostFeed({ result, mine = false }: Props) {
           {/* 카드 전체가 클릭되도록 relative로 두고, 아래 상세 링크가 after로 카드 전체를 덮는다(링크는 하나라서 중첩되지 않는다) */}
           <article className="relative flex flex-col gap-3 rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-[0_1px_3px_rgb(0_0_0_/_0.05)] transition-colors hover:bg-[#f9fafb] has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-[#2563eb] max-[480px]:rounded-[20px] max-[480px]:p-5">
             <header className="flex min-w-0 items-center gap-3 [&>div]:min-w-0 [&>div]:[overflow-wrap:anywhere]">
-              <span aria-hidden="true" className="flex size-10 flex-[0_0_40px] items-center justify-center rounded-full bg-[#dbeafe] font-semibold text-[#1e40af]">{post.author.name.trim().slice(0, 1) || '?'}</span>
+              <UserAvatar userId={post.author.id} name={post.author.name} />
               <div><p className="font-semibold">{post.author.name}</p>{/* 상대 시간은 서버와 브라우저가 그리는 시각이 달라질 수 있어 suppressHydrationWarning을 쓴다. 마우스를 올리면 정확한 시각이 보인다 */}<time className="text-sm text-[#6b7280]" dateTime={post.createdAt} title={formatDateTime(post.createdAt)} suppressHydrationWarning>{formatRelative(post.createdAt)}</time></div>
             </header>
             {post.title?.trim() ? <>

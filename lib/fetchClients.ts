@@ -20,8 +20,13 @@ export async function springFetch(
     throw new Error('허용되지 않은 API 주소입니다.');
   }
   const headers = new Headers(init.headers);
-  headers.set('Accept', 'application/json');
-  if (init.body !== undefined && init.body !== null) {
+  if (init.body instanceof FormData) {
+    headers.delete('Content-Type');
+  } else if (
+    init.body !== undefined &&
+    init.body !== null &&
+    !headers.has('Content-Type')
+  ) {
     headers.set('Content-Type', 'application/json');
   }
   try {

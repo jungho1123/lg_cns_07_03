@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { requireCurrentUser } from '@/lib/currentUser';
 import { formatDateTime } from '@/lib/date';
+import UserAvatar from '@/components/molecules/UserAvatar';
 import { getPost } from '@/service/spring/postReadService';
 import PostLikeButton from '../PostLikeButton';
 import CommentList from './CommentList';
@@ -35,7 +36,7 @@ async function PostDetail({ params }: { params: Params }) {
         {title && <h2 className="break-words text-2xl font-bold">{title}</h2>}
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-800">{post.author.name.trim().slice(0, 1) || '?'}</span>
+            <UserAvatar userId={post.author.id} name={post.author.name} />
             <div className="min-w-0"><p className="font-semibold">{post.author.name}</p>
               {/* 작성 시각 한 줄. 수정된 글이면 "· 수정됨"을 붙이고, 마우스를 올리면 수정 시각이 보인다 */}
               <p className="text-sm text-gray-500">
