@@ -4,7 +4,7 @@ import { requireCurrentUser } from '@/lib/currentUser';
 import { formatDateTime } from '@/lib/date';
 import { getPost } from '@/service/spring/postReadService';
 import CommentList from './CommentList';
-import PostActions from './PostActions';
+import PostOwnerActions from './PostOwnerActions';
 import PostDetailFallback from "@/components/loader/PostDetailFallback";
 
 
@@ -44,7 +44,7 @@ async function PostDetail({ params }: { params: Params }) {
             </div>
           </div>
           {/* 내 글일 때만 오른쪽에 수정/삭제 버튼 (아직 모양만 있고 동작은 연결 전) */}
-          {isMine && <PostActions />}
+          {isMine && <PostOwnerActions postId={String(post.id)} />}
         </div>
       </header>
       <div className={`whitespace-pre-wrap break-words border-t border-gray-100 pt-5 ${title ? 'leading-7' : 'text-lg leading-8'}`}>{post.content}</div>
