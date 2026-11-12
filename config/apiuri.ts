@@ -7,6 +7,12 @@ export const matchApiUrl = {
     logout: '/api/v1/auth/logout',
   },
   user: {
+    list: '/api/v1/users',
+    detail: (userId: number) => `/api/v1/users/${userId}`,
+    avatar: {
+      me: '/api/v1/users/me/avatar',
+      detail: (userId: number) => `/api/v1/users/${userId}/avatar`,
+    },
     password: '/api/v1/users/me/password',
   },
   postRead: {
@@ -30,26 +36,5 @@ export const matchApiUrl = {
     read: (notificationId: number) =>
       `/api/v1/notifications/${notificationId}/read`,
     readAll: '/api/v1/notifications/read-all',
-  },
-  user: {
-    list: '/api/v1/users',
-
-    detail: (userId: number) => `/api/v1/users/${userId}`,
-
-    // search: '/api/v1/users/search',
-
-    avatar: {
-      me: '/api/v1/users/me/avatar',
-      detail: (userId: number) => `/api/v1/users/${userId}/avatar`,
-    },
-
-    // status: '/api/v1/users/me/status',
-
-    // password: '/api/v1/users/me/password',
-
-    // accountRoleRequest: {
-    //   me: '/api/v1/users/me/account-role-request',
-    //   list: '/api/v1/users/account-role-requests',
-    // },
   },
 };
