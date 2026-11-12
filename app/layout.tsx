@@ -6,7 +6,7 @@ import MainLayout from "@/components/templates/MainLayout";
 import "./globals.css";
 
 // 헤더/푸터를 보이지 않을 경로 (로그인 화면 등)
-const BARE_PATHS = ["/login"];
+const BARE_PATHS = ["/login", "/signup"];
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
