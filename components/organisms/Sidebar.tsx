@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { X } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export default function Sidebar({
       `}
     >
       {/* 로고 영역 */}
-      <div className="flex h-16 items-center px-6 border-b border-gray-200">
+      <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
         <Link
           href="/"
           onClick={onClose}
@@ -37,6 +38,15 @@ export default function Sidebar({
         >
           LG CNS Project
         </Link>
+
+        {/* 모바일 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="min-[1024px]:hidden rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-black transition-colors"
+          aria-label="사이드바 닫기"
+        >
+          <X size={22} />
+        </button>
       </div>
 
       {/* 메뉴 영역 */}
