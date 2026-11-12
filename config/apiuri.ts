@@ -6,6 +6,9 @@ export const matchApiUrl = {
     refresh: '/api/v1/auth/refresh',
     logout: '/api/v1/auth/logout',
   },
+  user: {
+    password: '/api/v1/users/me/password',
+  },
   postRead: {
     list: '/api/v1/posts',
     mine: '/api/v1/posts/me',

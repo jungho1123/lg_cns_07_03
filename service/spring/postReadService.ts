@@ -90,3 +90,17 @@ export async function listMyPosts(query: PostListQuery = {}): Promise<PostReadRe
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   return read(`${matchApiUrl.postRead.mine}?${params}`, parseMyPostPageData);
 }
+
+// 총개수 필드가 없으므로 모든 페이지를 합산합니다. 실패 시 부분 합계를 총개수로 표시하지 않습니다.
+export async function countMyPosts(): Promise<number | null> {
+  const ids = new Set<number>();
+  for (let page = 0; ; page++) {
+    const result = await listMyPosts({ page, size: 20 });
+    if (!result.ok || result.data.page !== page) return null;
+    const previousSize = ids.size;
+    for (const post of result.data.items) ids.add(post.id);
+    if (!result.data.hasNext) return ids.size;
+    // 서버가 같은 페이지를 반복하거나 빈 페이지에 hasNext를 보내면 중단합니다.
+    if (ids.size === previousSize) return null;
+  }
+}
