@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { requireCurrentUser } from '@/lib/currentUser';
 import { formatDateTime } from '@/lib/date';
 import { getPost } from '@/service/spring/postReadService';
+import PostLikeButton from '../PostLikeButton';
 import CommentList from './CommentList';
 import PostOwnerActions from './PostOwnerActions';
 import PostDetailFallback from "@/components/loader/PostDetailFallback";
@@ -48,10 +49,10 @@ async function PostDetail({ params }: { params: Params }) {
         </div>
       </header>
       <div className={`whitespace-pre-wrap break-words border-t border-gray-100 pt-5 ${title ? 'leading-7' : 'text-lg leading-8'}`}>{post.content}</div>
-      {/* 좋아요 수, 댓글 수 (목록 카드와 같은 모양). 아이콘은 읽지 않고 숨은 문장으로 뜻을 전달한다 */}
+      {/* 좋아요 버튼과 댓글 수 (목록 카드와 같은 모양) */}
       <div className="flex items-center gap-4 text-sm text-gray-500">
-        <span className="sr-only">좋아요 {post.likeCount}개, 댓글 {post.commentCount}개</span>
-        <span aria-hidden="true">♡ {post.likeCount}</span>
+        <PostLikeButton postId={post.id} likeCount={post.likeCount} likedByMe={post.likedByMe} />
+        <span className="sr-only">댓글 {post.commentCount}개</span>
         <span aria-hidden="true">💬 {post.commentCount}</span>
       </div>
       <div className="[&>section>ul]:space-y-3 [&>section>ul>li]:rounded-xl [&>section>ul>li]:bg-slate-50 [&>section>ul>li]:p-4 [&>section>p:not([role])]:rounded-xl [&>section>p:not([role])]:bg-slate-50 [&>section>p:not([role])]:p-4">
@@ -59,7 +60,6 @@ async function PostDetail({ params }: { params: Params }) {
           <CommentList postId={post.id} />
         </Suspense>
       </div>
-      {/* 게시글 수정·삭제 버튼은 위 헤더에 모양만 있고 동작은 연결 전이다. 좋아요는 구현 후 연결한다. */}
     </article>
   );
 }

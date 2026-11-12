@@ -15,6 +15,8 @@ export function notificationMessage(item: NotificationItem): string {
   switch (item.type) {
     case 'COMMENT_CREATED':
       return `${name}님이 나의 글에 댓글을 작성했습니다`;
+    case 'POST_LIKED': // 2026-11-12 실제 응답 확인: resourceType FEED_POST, body는 null
+      return `${name}님이 나의 글에 좋아요를 눌렀습니다`;
     default:
       return item.title;
   }
