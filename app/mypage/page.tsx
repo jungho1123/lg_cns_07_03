@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowRight, FileText } from "lucide-react";
 import { auth } from "@/auth";
-import ProfileAvatar from "@/components/atoms/ProfileAvatar";
+import AvatarEdit from "@/components/organisms/AvatarEdit";
 import PasswordEditButton from "@/components/organisms/PasswordEditButton";
 import { countMyPosts, listMyPosts } from "@/service/spring/postReadService";
 import MyPageFallback from "@/components/loader/MyPageFallback";
@@ -87,7 +87,7 @@ async function MyPageContent() {
         <div className="mx-auto max-w-5xl">
           <h1 id="profile-heading" className="text-xl font-bold text-gray-900">프로필</h1>
           <div className="mt-6 grid items-start gap-8 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-12">
-            <ProfileAvatar src={user?.avatarUrl || session.user.image || null} name={name} className="size-36 text-5xl sm:size-40" sizes="160px" />
+            <AvatarEdit key={session.user.id} userId={session.user.id} name={name} />
             <div className="min-w-0">
               <dl className="m-0 grid gap-4 text-left">
                 <div className="grid gap-1">
