@@ -24,13 +24,25 @@ export default function PostEditForm({ postId, title, content }: Props) {
     updatePostAction,
     initialState,
   );
+  const [currentTitle, setCurrentTitle] = useState(title);
   const [currentContent, setCurrentContent] = useState(content);
 
   return (
     <form action={formAction} className="space-y-5 rounded-3xl border bg-white p-6">
       <input type="hidden" name="postId" value={postId} />
-      {/* 수정 API가 제목과 본문을 함께 받으므로 기존 제목을 화면에 표시하지 않고 전송한다. */}
-      <input type="hidden" name="title" value={title} />
+
+      <div className="space-y-2">
+        <label htmlFor="title" className="block font-semibold">제목</label>
+        <input
+          id="title"
+          name="title"
+          required
+          maxLength={200}
+          value={currentTitle}
+          onChange={event => setCurrentTitle(event.target.value)}
+          className="w-full rounded-xl border px-4 py-3"
+        />
+      </div>
 
       <div className="space-y-2">
         <label htmlFor="content" className="block font-semibold">본문</label>
