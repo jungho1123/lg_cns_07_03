@@ -35,16 +35,14 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardTitle>로그인</CardTitle>
+          <CardDescription>이메일과 비밀번호를 입력해 주세요.</CardDescription>
         </CardHeader>
         <CardContent>
           <form noValidate action={formAction} onSubmit={onSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">이메일</FieldLabel>
                 <Input
                   id="email"
                   name="email"
@@ -55,7 +53,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">비밀번호</FieldLabel>
                   {/* <a
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
@@ -68,10 +66,10 @@ export function LoginForm({
               <Field>
                 <FieldError> {message} </FieldError>
                 <Button type="submit" disabled={pending} aria-busy={pending}>
-                  {pending ? 'Logging in...' : 'Login'}
+                  {pending ? '로그인 중...' : '로그인'}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/signup">Sign up</a>
+                  아직 계정이 없으신가요?<a href="/signup">회원가입</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

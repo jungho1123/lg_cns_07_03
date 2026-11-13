@@ -12,6 +12,7 @@ import { validateSignup } from '@/lib/auth/validation';
 
 export function useSignupForm() {
   const [state, formAction, pending] = useActionState(signupAction, {
+    success: false,
     message: '',
   });
   const [clientMessage, setClientMessage] = useState('');
@@ -22,7 +23,7 @@ export function useSignupForm() {
   }, [pending, state]);
 
   const handleSubmit: ComponentProps<'form'>['onSubmit'] = (event) => {
-    if (pending || submitting.current) {
+    if (pending || submitting.current || state.success) {
       event.preventDefault();
       return;
     }
@@ -50,6 +51,7 @@ export function useSignupForm() {
     formAction,
     handleSubmit,
     pending,
+    success: state.success,
     message: clientMessage || state.message,
   };
 }
