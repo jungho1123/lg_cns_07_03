@@ -1,5 +1,6 @@
 'use client';
 
+import { Heart } from 'lucide-react';
 import { startTransition, useOptimistic, useState, useTransition } from 'react';
 import { togglePostLikeAction } from '@/actions/likeActions';
 
@@ -54,7 +55,9 @@ export default function PostLikeButton({ postId, likeCount, likedByMe }: Props) 
           shown.liked ? 'text-red-500' : 'text-gray-500 hover:bg-red-50 hover:text-red-500'
         }`}
       >
-        <span aria-hidden="true">{shown.liked ? '♥' : '♡'}</span>
+        {/* 같은 하트 그림 하나로, 안 눌렀을 때는 속을 비우고(빈 하트) 눌렀을 때는 속을 채운다(꽉 찬 하트).
+            글자 ♡/♥는 크기와 모양이 서로 달라서 아이콘을 쓴다. 색은 위의 text-red-500이 바꾼다. */}
+        <Heart aria-hidden="true" className="size-4" fill={shown.liked ? 'currentColor' : 'none'} />
         <span aria-hidden="true">{shown.count}</span>
       </button>
       {message && (

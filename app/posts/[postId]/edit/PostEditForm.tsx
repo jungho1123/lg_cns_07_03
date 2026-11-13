@@ -19,6 +19,16 @@ export default function PostEditForm({ postId, title, content }: Props) {
   const [currentTitle, setCurrentTitle] = useState(title);
   const [currentContent, setCurrentContent] = useState(content);
 
+  // 서버에서 받은 글이 바뀌면 입력 상태도 새 값으로 맞춘다.
+  // 이 프로젝트는 이전에 열었던 화면을 숨겨 두었다가 다시 보여 주는데(cacheComponents), 그때 이 폼도 재사용된다.
+  // useState의 초기값은 처음 한 번만 쓰이므로, 이렇게 맞추지 않으면 저장한 뒤 다시 열었을 때 수정 전 내용(abc)이 남는다.
+  const [seen, setSeen] = useState({ title, content });
+  if (seen.title !== title || seen.content !== content) {
+    setSeen({ title, content });
+    setCurrentTitle(title);
+    setCurrentContent(content);
+  }
+
   // 제목이 있던 글만 제목 칸을 보여 준다. 제목 없는 글(작성창으로 쓴 글)은 본문만 고친다.
   const hasTitle = title.length > 0;
   const empty = currentContent.trim().length === 0 || (hasTitle && currentTitle.trim().length === 0);
