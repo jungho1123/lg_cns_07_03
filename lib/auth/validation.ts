@@ -37,7 +37,7 @@ export const signupSchema = z.object({
   name: z
     .string({ error: ' 공백일 수 없습니다.' })
     .trim()
-    .min(1, { error: ' 공백일 수 없습니다.' })
+    .min(2, { error: ' 이름은 2자 이상이어야 합니다.' })
     .max(80, { error: ' 이름은 2에서 80자 사이여야 합니다.' }),
   password: z
     .string({ error: ' 공백일 수 없습니다.' })
