@@ -17,6 +17,19 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { RoleSchema } from '@/lib/auth/validation';
+
+const roleLabels: Record<(typeof RoleSchema.options)[number], string> = {
+  STUDENT: '학생',
+  MENTOR: '멘토',
+  INSTRUCTOR: '강사',
+  OPERATOR: '운영자',
+  PROJECT_MANAGER: '프로젝트 매니저',
+  PROJECT_LEADER: '프로젝트 리더',
+  PLANNER: '기획자',
+  DESIGNER: '디자이너',
+  DEVELOPER: '개발자',
+};
+
 type SignupFormProps = Omit<React.ComponentProps<'div'>, 'onSubmit'> & {
   formAction: (formData: FormData) => void;
   onSubmit: React.ComponentProps<'form'>['onSubmit'];
@@ -77,7 +90,7 @@ export function SignupForm({
                   </option>
                   {RoleSchema.options.map((role) => (
                     <option key={role} value={role}>
-                      {role.toLowerCase().replaceAll('_', ' ')}
+                      {roleLabels[role]}
                     </option>
                   ))}
                 </select>
