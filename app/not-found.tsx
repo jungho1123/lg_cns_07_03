@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
- 
+import { Button, buttonVariants } from '@/components/ui/button';
+
 // 모양 선택
 type PupilShape = 'circle' | 'eye' | 'square' | 'diamond' | 'star' | 'heart';
 const PUPIL_SHAPE: PupilShape = 'eye';
@@ -45,8 +46,8 @@ export default function NotFound() {
       <style>{`
         /* ── 눈 (0의 구멍 위에 얹는 영역) ── */
         .nf-eye {
-          --ew: 0.22em; /* 눈 영역 너비 (0의 구멍보다 살짝 크게) */
-          --eh: 0.6em;  /* 눈 영역 높이 */
+          --ew: 0.30em; /* 눈 영역 너비 (0의 구멍보다 살짝 크게) */
+          --eh: 0.61em;  /* 눈 영역 높이 */
           --cx: 0.03em; /* 구멍 가로 중심 보정 (letter-spacing 때문에 생기는 쏠림 보정) */
           --cy: 0.05em;    /* 구멍 세로 중심 보정 */
           position: absolute;
@@ -158,8 +159,8 @@ export default function NotFound() {
         {/* 404 */}
         <h1
           aria-label="404"
-          className="mt-2 select-none text-[clamp(9rem,30vw,20rem)] font-extrabold leading-[1] tracking-[-0.06em]"
-        >
+          className="mt-2 select-none font-[family-name:var(--font-geist-sans)] text-[clamp(9rem,30vw,20rem)] font-extrabold leading-[1] tracking-[-0.06em]"
+  >
           <span aria-hidden="true">4</span>
           <span ref={zeroRef} aria-hidden="true" className="relative inline-block">
             0
@@ -191,19 +192,12 @@ export default function NotFound() {
  
         {/* 버튼 */}
         <div className="mt-8 flex items-center gap-2">
-          <Link
-            href="/"
-            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1f1f1d] px-6 text-xs font-semibold text-white transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1f1f1d]"
-          >
+         <Link href="/" className={buttonVariants({ className: 'px-6 text-xs' })}>
             홈으로 돌아가기
-          </Link>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#d9d9d3] bg-transparent px-6 text-xs font-semibold transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1f1f1d]"
-          >
+         </Link>
+          <Button variant="outline" className="px-6 text-xs" onClick={() => router.back()}>
             이전 페이지
-          </button>
+          </Button>
         </div>
  
         {/* 고객센터 안내 */}
