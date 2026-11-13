@@ -48,6 +48,6 @@ export async function logoutAction(): Promise<{ message: string }> {
   }
   // 서버 세션 종료에 실패해도 현재 기기의 인증 쿠키는 반드시 정리한다.
   return signOut({
-    redirectTo: serverLogoutFailed ? '/login?logout=server-error' : '/login',
+    redirectTo: serverLogoutFailed ? '/login?logout=server-error' : '/',
   });
 }
