@@ -36,26 +36,24 @@ export function SignupForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Create your account</CardTitle>
-          <CardDescription>
-            Enter your email below to create your account
-          </CardDescription>
+          <CardTitle className="text-xl">회원가입</CardTitle>
+          <CardDescription>이메일과 비밀번호를 입력해 주세요.</CardDescription>
         </CardHeader>
         <CardContent>
           <form noValidate action={formAction} onSubmit={onSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                <FieldLabel htmlFor="name">이름</FieldLabel>
                 <Input
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="홍길동"
                   required
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">이메일</FieldLabel>
                 <Input
                   id="email"
                   name="email"
@@ -65,7 +63,7 @@ export function SignupForm({
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="role">Role</FieldLabel>
+                <FieldLabel htmlFor="role">역할</FieldLabel>
                 <select
                   id="role"
                   name="role"
@@ -75,7 +73,7 @@ export function SignupForm({
                   className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm capitalize disabled:opacity-50"
                 >
                   <option value="" disabled>
-                    Select your role
+                    역할을 선택해 주세요
                   </option>
                   {RoleSchema.options.map((role) => (
                     <option key={role} value={role}>
@@ -87,7 +85,7 @@ export function SignupForm({
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <FieldLabel htmlFor="password">비밀번호</FieldLabel>
                     <Input
                       id="password"
                       name="password"
@@ -97,7 +95,7 @@ export function SignupForm({
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
+                      비밀번호 확인
                     </FieldLabel>
                     <Input
                       id="confirm-password"
@@ -108,16 +106,16 @@ export function SignupForm({
                   </Field>
                 </Field>
                 <FieldDescription>
-                  Must be at least 8 characters long.
+                  비밀번호는 최소 8자 이상이어야 합니다.
                 </FieldDescription>
               </Field>
               <Field>
                 <FieldError>{message}</FieldError>
                 <Button type="submit" disabled={pending} aria-busy={pending}>
-                  {pending ? 'Creating account...' : 'Create Account'}
+                  {pending ? '회원가입 중...' : '회원가입'}
                 </Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <a href="/login">Sign in</a>
+                  이미 계정이 있으신가요? <a href="/login">로그인</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -125,8 +123,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
-        and <a href="#">Privacy Policy</a>.
+        회원가입을 진행하면 <a href="#">이용약관</a> 및{' '}
+        <a href="#">개인정보처리방침</a>에 동의하게 됩니다.
       </FieldDescription>
     </div>
   );
